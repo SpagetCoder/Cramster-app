@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    tools:context=".MainActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/parent_linear_layout">
+
+            <Button
+                android:id="@+id/add_field_button"
+                android:layout_width="112dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginVertical="10dp"
+                android:background="@drawable/button"
+                android:onClick="onAddField"
+                android:paddingLeft="5dp"
+                android:text="Add field "
+                android:textColor="#FFF"
+                android:textSize="15dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/imageIv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxHeight="250dp"
+        android:visibility="gone"/>
+    
+</RelativeLayout>

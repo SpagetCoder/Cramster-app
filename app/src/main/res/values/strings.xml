@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">LearnWords</string>
+    <string name="title_activity_test_creation_menu">TestCreationMenu</string>
+    <string name="add_your_word">add your word</string>
+    <string name="add_your_translation">add translation</string>
+    <string name="save_test">save test</string>
+    <string name="add_image">add image</string>
+    <string name="help">help</string>
+</resources>

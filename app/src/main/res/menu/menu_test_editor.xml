@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/saveTest"
+        android:title="@string/save_test"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_save"/>
+
+    <item
+        android:id="@+id/addImage"
+        android:title="@string/add_image"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_photo"/>
+
+    <item
+        android:id="@+id/help"
+        android:title="@string/help"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_help"/>
+
+
+</menu>
