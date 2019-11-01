@@ -254,6 +254,8 @@ public class TestEditor extends AppCompatActivity
             {
 //                saveTest();
 //                readTest();
+                super.finish();
+                Toast.makeText(this, "Test saved", Toast.LENGTH_SHORT).show();
             }
 
         }
