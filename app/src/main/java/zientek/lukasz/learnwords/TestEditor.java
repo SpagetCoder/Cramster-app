@@ -46,17 +46,38 @@ import java.util.Map;
 public class TestEditor extends AppCompatActivity
 {
     private LinearLayout parentLinearLayout;
-    //    EditText mResultEt;
+    private String mFileName;
     ImageView mPreviewIv;
 
-    private static final int CAMERA_REQUEST_CODE = 200;
-    private static final int STORAGE_REQUEST_CODE = 400;
-    private static final int IMAGE_GALLERY_REQUEST_CODE = 1000;
-    private static final int IMAGE_CAMERA_REQUEST_CODE = 1001;
+    private static final int CAMERA_REQUEST_CODE = 1;
+    private static final int STORAGE_REQUEST_CODE = 2;
+    private static final int IMAGE_GALLERY_REQUEST_CODE = 3;
+    private static final int IMAGE_CAMERA_REQUEST_CODE = 4;
 
     String cameraPermission[];
     String storagePermission[];
     Uri image_uri;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_test_editor);
+        parentLinearLayout = findViewById(R.id.parent_linear_layout);
+        mPreviewIv = findViewById(R.id.imageIv);
+
+        cameraPermission = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        storagePermission = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+        mFileName = getIntent().getStringExtra("FILE_NAME");
+
+        if(mFileName != null)
+        {
+            readTest(mFileName);
+        }
+
+    }
 
     public static void deleteCache(Context context)
     {
@@ -94,23 +115,7 @@ public class TestEditor extends AppCompatActivity
 
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_test_editor);
-
-        parentLinearLayout = findViewById(R.id.parent_linear_layout);
-//        mResultEt = findViewById(R.id.resultEt);
-        mPreviewIv = findViewById(R.id.imageIv);
-
-        cameraPermission = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        storagePermission = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-
-    }
-
-    public void onAddField(View view)
+    public void onAddField(View v)
     {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View rowView = inflater.inflate(R.layout.field, null);
@@ -138,24 +143,13 @@ public class TestEditor extends AppCompatActivity
         {
             e.printStackTrace();
         }
-
-
-//         Map<String,String> workplox = collectInput();
-//         StringBuilder work = new StringBuilder();
-//
-//          for (String keys : workplox.keySet())
-//           {
-//              work.append(keys).append(" -- ").append(workplox.get(keys)).append("\n");
-//           }
-//
-//           mResultEt.append(work.toString());
     }
 
-    private void readTest()
+    private void readTest(String fileName)
     {
         try
         {
-            FileInputStream fileInputStream = openFileInput("testFile");
+            FileInputStream fileInputStream = openFileInput(fileName);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
 
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -167,7 +161,21 @@ public class TestEditor extends AppCompatActivity
                 stringBuilder.append(lines).append("\n");
             }
 
-//            mResultEt.append(stringBuilder.toString());
+            String[] linesOfWords = stringBuilder.toString().split("\n");
+
+            for(int i = 0; i < linesOfWords.length; i++)
+            {
+                String lineWords = linesOfWords[i];
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                final View rowView = inflater.inflate(R.layout.field, null);
+                EditText out1 = rowView.findViewById(R.id.edit_text);
+                EditText out2 = rowView.findViewById(R.id.edit_text2);
+
+                String[] singleWords = lineWords.split("-");
+                out1.setText(singleWords[0]);
+                out2.setText(singleWords[1]);
+                parentLinearLayout.addView(rowView, parentLinearLayout.getChildCount() - 1);
+            }
 
         }
 
@@ -181,10 +189,11 @@ public class TestEditor extends AppCompatActivity
         }
     }
 
-    private Map collectInput()
+    private String collectInput()
     {
-        Map<String,String> map = new HashMap<>();
+//        Map<String,String> map = new HashMap<>();
         int size = parentLinearLayout.getChildCount();
+        StringBuilder stringBuilder = new StringBuilder();
 
         for (int i=0 ; i < size-1 ; i++)
         {
@@ -192,11 +201,11 @@ public class TestEditor extends AppCompatActivity
             EditText text = view.findViewById(R.id.edit_text);
             EditText text2 = view.findViewById(R.id.edit_text2);
 
-            map.put(text.getText().toString(),text2.getText().toString());
-            //s.append(text.getText().toString()).append(" - ").append(text2.getText().toString()).append("\n");
+//            map.put(text.getText().toString(),text2.getText().toString());
+            stringBuilder.append(text.getText().toString()).append(" - ").append(text2.getText().toString()).append("\n");
         }
 
-        return map;
+        return stringBuilder.toString();
     }
 
     private boolean checkIfComplete()
@@ -252,7 +261,7 @@ public class TestEditor extends AppCompatActivity
                 Toast.makeText(this, "Incomplete data", Toast.LENGTH_SHORT).show();
             else
             {
-//                saveTest();
+                saveTest();
 //                readTest();
                 super.finish();
                 Toast.makeText(this, "Test saved", Toast.LENGTH_SHORT).show();
@@ -330,13 +339,13 @@ public class TestEditor extends AppCompatActivity
     private void pickCamera()
     {
         ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "Picture");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "Image for convertion");
+        values.put(MediaStore.Images.Media.TITLE, "Image for conversion");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Image for conversion");
         image_uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, image_uri);
-        startActivityForResult(cameraIntent,IMAGE_CAMERA_REQUEST_CODE);
+        startActivityForResult(cameraIntent, IMAGE_CAMERA_REQUEST_CODE);
     }
 
     private void requestCameraPermission()
@@ -422,7 +431,6 @@ public class TestEditor extends AppCompatActivity
                 mPreviewIv.setImageURI(resultUri);
                 BitmapDrawable bitmapDrawable = (BitmapDrawable)mPreviewIv.getDrawable();
                 Bitmap bitmap = bitmapDrawable.getBitmap();
-
                 TextRecognizer recognizer = new TextRecognizer.Builder(getApplicationContext()).build();
 
                 if (!recognizer.isOperational())
@@ -452,7 +460,8 @@ public class TestEditor extends AppCompatActivity
                                     stringBuilder.append(element.getValue());
                                 }
 
-                                else if(rightOfLeft-leftOfRight >= -60 && (bottom-element.getBoundingBox().bottom <= 70 && bottom - element.getBoundingBox().bottom >= -70)
+                                else if(rightOfLeft-leftOfRight >= -60 && (bottom-element.getBoundingBox().bottom <= 70
+                                        && bottom - element.getBoundingBox().bottom >= -70)
                                         && !element.getValue().endsWith("-"))
                                 {
                                     stringBuilder.append(" ").append(element.getValue());
@@ -479,16 +488,13 @@ public class TestEditor extends AppCompatActivity
 
                     String finalResult = stringBuilder.toString();
                     String finalResultAfterValidation = finalResult.replaceAll("(-)+","-");
-
-
                     String[] linesOfWords = finalResultAfterValidation.split("\n");
+
                     for(int i = 0; i < linesOfWords.length; i++)
                     {
                         String lineWords = linesOfWords[i];
-
                         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                         final View rowView = inflater.inflate(R.layout.field, null);
-
                         EditText out1 = rowView.findViewById(R.id.edit_text);
                         EditText out2 = rowView.findViewById(R.id.edit_text2);
 
@@ -513,13 +519,6 @@ public class TestEditor extends AppCompatActivity
                     }
                 }
             }
-
-            else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE)
-            {
-                Exception exception = result.getError();
-                Toast.makeText(this, ""+ exception, Toast.LENGTH_SHORT).show();
-            }
-
 
             deleteCache(this);
 

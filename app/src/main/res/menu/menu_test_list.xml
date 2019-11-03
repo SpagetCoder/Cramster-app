@@ -8,5 +8,4 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_action_help"/>
 
-
 </menu>
