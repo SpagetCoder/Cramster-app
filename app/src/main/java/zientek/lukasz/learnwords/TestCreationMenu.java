@@ -63,6 +63,17 @@ public class TestCreationMenu extends AppCompatActivity
                 startActivity(intent);
             }
         });
+
+        mListViewTests.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                String filename = mListViewTests.getItemAtPosition(position).toString();
+                File fileToDelete = new File(fileDir,filename);
+                fileToDelete.delete();
+                return true;
+            }
+        });
     }
 
     @Override

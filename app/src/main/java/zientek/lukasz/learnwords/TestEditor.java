@@ -55,9 +55,6 @@ public class TestEditor extends AppCompatActivity
     EditText inputDialog;
     private String dialogInput;
 
-    ///////
-    private boolean resultValue;
-
     private static final int CAMERA_REQUEST_CODE = 1;
     private static final int STORAGE_REQUEST_CODE = 2;
     private static final int IMAGE_GALLERY_REQUEST_CODE = 3;
@@ -185,6 +182,11 @@ public class TestEditor extends AppCompatActivity
                     inputDialog.setHint(" Please provide a name");
                 }
 
+//                else if (checkIfFileExists(dialogInput))
+//                {
+//                    Toast.makeText(TestEditor.this, "fdsfsfsdf", Toast.LENGTH_SHORT).show();
+//                }
+
                 else
                     handler.sendMessage(handler.obtainMessage());
 
@@ -195,6 +197,19 @@ public class TestEditor extends AppCompatActivity
         catch(RuntimeException e){}
 
         return dialogInput;
+    }
+
+    public boolean checkIfFileExists(String fileName)
+    {
+        final File fileDir = this.getFilesDir();
+
+        for(String file: fileDir.list())
+        {
+            if(file.equals(fileName))
+                return true;
+        }
+
+        return false;
     }
 
     private void readTest(String fileName)
