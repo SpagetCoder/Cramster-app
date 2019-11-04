@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -134,13 +135,7 @@ public class TestEditor extends AppCompatActivity
 
     private void saveTest()
     {
-        String filename = getDialogValueBack();
-        if(filename == null)
-        {
-            Toast.makeText(this, "Saving cancelled", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        String filename = askTestName();
         String fileContents = collectInput();
         FileOutputStream outputStream;
 
@@ -156,7 +151,7 @@ public class TestEditor extends AppCompatActivity
         }
     }
 
-    public String getDialogValueBack()
+    public String askTestName()
     {
         final Handler handler = new Handler()
         {
@@ -167,28 +162,34 @@ public class TestEditor extends AppCompatActivity
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Name your test");
         inputDialog = new EditText(this);
-        builder.setView(inputDialog);
-        builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
+
+        final AlertDialog builder = new AlertDialog.Builder(this)
+                .setTitle("Name your test")
+                .setView(inputDialog)
+                .setPositiveButton("Save", null)
+                .show();
+
+        Button positiveButton = builder.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveButton.setOnClickListener(new View.OnClickListener()
         {
-            public void onClick(DialogInterface dialog, int id)
+            @Override
+            public void onClick(View v)
             {
                 dialogInput = inputDialog.getText().toString();
-                handler.sendMessage(handler.obtainMessage());
+
+                if (dialogInput.trim().isEmpty())
+                {
+                    inputDialog.setText("");
+                    inputDialog.setHintTextColor(Color.RED);
+                    inputDialog.setHint(" Please provide a name");
+                }
+
+                else
+                    handler.sendMessage(handler.obtainMessage());
+
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int id)
-            {
-                dialogInput = null;
-                dialog.cancel();
-                handler.sendMessage(handler.obtainMessage());
-            }
-        });
-        builder.show();
 
         try{ Looper.loop(); }
         catch(RuntimeException e){}
