@@ -27,7 +27,6 @@ import java.util.ArrayList;
 public class TestCreationMenu extends AppCompatActivity
 {
     private ListView mListViewTests;
-    ArrayList<String> tests = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -37,13 +36,19 @@ public class TestCreationMenu extends AppCompatActivity
 
         mListViewTests = (ListView) findViewById(R.id.main_listview_tests);
 
+    }
 
-        final File file = this.getFilesDir();
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        ArrayList<String> tests = new ArrayList<>();
+        final File fileDir = this.getFilesDir();
 
-        for(String idk: file.list())
-            tests.add(idk);
+        for(String file: fileDir.list())
+            tests.add(0,file);
 
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,tests);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,tests);
         mListViewTests.setAdapter(arrayAdapter);
 
         mListViewTests.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -58,8 +63,6 @@ public class TestCreationMenu extends AppCompatActivity
                 startActivity(intent);
             }
         });
-
-
     }
 
     @Override

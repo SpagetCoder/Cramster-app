@@ -25,6 +25,7 @@
         android:layout_gravity="center"
         android:layout_marginVertical="10dp"
         android:background="@drawable/button"
+        android:onClick="goToLearnMenu"
         android:paddingLeft="5dp"
         android:text="Learn"
         android:textColor="#FFF"

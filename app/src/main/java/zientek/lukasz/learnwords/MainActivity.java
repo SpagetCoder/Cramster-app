@@ -20,4 +20,10 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(MainActivity.this,TestCreationMenu.class);
         startActivity(intent);
     }
+
+    public void goToLearnMenu(View view)
+    {
+        Intent intent = new Intent(MainActivity.this,LearnMenu.class);
+        startActivity(intent);
+    }
 }

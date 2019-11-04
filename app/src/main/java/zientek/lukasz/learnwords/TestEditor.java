@@ -17,6 +17,9 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -40,14 +43,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class TestEditor extends AppCompatActivity
 {
     private LinearLayout parentLinearLayout;
     private String mFileName;
     ImageView mPreviewIv;
+
+    EditText inputDialog;
+    private String dialogInput;
+
+    ///////
+    private boolean resultValue;
 
     private static final int CAMERA_REQUEST_CODE = 1;
     private static final int STORAGE_REQUEST_CODE = 2;
@@ -66,16 +74,13 @@ public class TestEditor extends AppCompatActivity
         setContentView(R.layout.activity_test_editor);
         parentLinearLayout = findViewById(R.id.parent_linear_layout);
         mPreviewIv = findViewById(R.id.imageIv);
+        mFileName = getIntent().getStringExtra("FILE_NAME");
 
         cameraPermission = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermission = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-        mFileName = getIntent().getStringExtra("FILE_NAME");
-
         if(mFileName != null)
-        {
             readTest(mFileName);
-        }
 
     }
 
@@ -129,8 +134,14 @@ public class TestEditor extends AppCompatActivity
 
     private void saveTest()
     {
-        String filename = "testFile";
-        String fileContents = collectInput().toString();
+        String filename = getDialogValueBack();
+        if(filename == null)
+        {
+            Toast.makeText(this, "Saving cancelled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String fileContents = collectInput();
         FileOutputStream outputStream;
 
         try
@@ -145,13 +156,52 @@ public class TestEditor extends AppCompatActivity
         }
     }
 
+    public String getDialogValueBack()
+    {
+        final Handler handler = new Handler()
+        {
+            @Override
+            public void handleMessage(Message mesg)
+            {
+                throw new RuntimeException();
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Name your test");
+        inputDialog = new EditText(this);
+        builder.setView(inputDialog);
+        builder.setPositiveButton("Done", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
+            {
+                dialogInput = inputDialog.getText().toString();
+                handler.sendMessage(handler.obtainMessage());
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
+            {
+                dialogInput = null;
+                dialog.cancel();
+                handler.sendMessage(handler.obtainMessage());
+            }
+        });
+        builder.show();
+
+        try{ Looper.loop(); }
+        catch(RuntimeException e){}
+
+        return dialogInput;
+    }
+
     private void readTest(String fileName)
     {
         try
         {
             FileInputStream fileInputStream = openFileInput(fileName);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             StringBuilder stringBuilder = new StringBuilder();
 
@@ -171,7 +221,7 @@ public class TestEditor extends AppCompatActivity
                 EditText out1 = rowView.findViewById(R.id.edit_text);
                 EditText out2 = rowView.findViewById(R.id.edit_text2);
 
-                String[] singleWords = lineWords.split("-");
+                String[] singleWords = lineWords.split(" - ");
                 out1.setText(singleWords[0]);
                 out2.setText(singleWords[1]);
                 parentLinearLayout.addView(rowView, parentLinearLayout.getChildCount() - 1);
@@ -191,7 +241,6 @@ public class TestEditor extends AppCompatActivity
 
     private String collectInput()
     {
-//        Map<String,String> map = new HashMap<>();
         int size = parentLinearLayout.getChildCount();
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -200,8 +249,6 @@ public class TestEditor extends AppCompatActivity
             View view = parentLinearLayout.getChildAt(i);
             EditText text = view.findViewById(R.id.edit_text);
             EditText text2 = view.findViewById(R.id.edit_text2);
-
-//            map.put(text.getText().toString(),text2.getText().toString());
             stringBuilder.append(text.getText().toString()).append(" - ").append(text2.getText().toString()).append("\n");
         }
 
@@ -262,7 +309,6 @@ public class TestEditor extends AppCompatActivity
             else
             {
                 saveTest();
-//                readTest();
                 super.finish();
                 Toast.makeText(this, "Test saved", Toast.LENGTH_SHORT).show();
             }
