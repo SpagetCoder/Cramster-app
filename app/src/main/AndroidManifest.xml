@@ -13,9 +13,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LearnScreen"
+        <activity android:name=".TestScreen"
             android:parentActivityName=".LearnMenu"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".LearnScreen"
+            android:parentActivityName=".LearnMenu"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".LearnMenu"
             android:parentActivityName=".MainActivity"

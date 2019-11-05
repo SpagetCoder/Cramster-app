@@ -42,14 +42,8 @@ public class TestCreationMenu extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-        ArrayList<String> tests = new ArrayList<>();
+        updateView();
         final File fileDir = this.getFilesDir();
-
-        for(String file: fileDir.list())
-            tests.add(0,file);
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,tests);
-        mListViewTests.setAdapter(arrayAdapter);
 
         mListViewTests.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
@@ -71,9 +65,22 @@ public class TestCreationMenu extends AppCompatActivity
                 String filename = mListViewTests.getItemAtPosition(position).toString();
                 File fileToDelete = new File(fileDir,filename);
                 fileToDelete.delete();
+                updateView();
                 return true;
             }
         });
+    }
+
+    public void updateView()
+    {
+        ArrayList<String> tests = new ArrayList<>();
+        final File fileDir = this.getFilesDir();
+
+        for(String file: fileDir.list())
+            tests.add(0,file);
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,tests);
+        mListViewTests.setAdapter(arrayAdapter);
     }
 
     @Override
@@ -105,9 +112,9 @@ public class TestCreationMenu extends AppCompatActivity
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle("How does it work?")
                 .setMessage("Here you can find list of all created tests. \n" +
-                        "To create a new test click on plus button below. \n" +
+                        "To create a new test click on plus button. \n" +
                         "To modify a test click on the name of the test. \n" +
-                        "To delete a test swipe the name of the test.")
+                        "To delete a test long press on the name of the test.")
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

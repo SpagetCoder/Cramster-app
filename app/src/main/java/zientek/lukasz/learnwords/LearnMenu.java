@@ -2,8 +2,12 @@ package zientek.lukasz.learnwords;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -52,7 +56,56 @@ public class LearnMenu extends AppCompatActivity
                 startActivity(intent);
             }
         });
+
+        mListViewTests.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                String filename = mListViewTests.getItemAtPosition(position).toString();
+
+                Intent intent = new Intent(LearnMenu.this, TestScreen.class);
+                intent.putExtra("FILE_NAME", filename);
+                startActivity(intent);
+//                updateView();
+                return true;
+            }
+        });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_test_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        int id = item.getItemId();
+
+        if (id == R.id.help)
+            showHelpDialog();
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showHelpDialog()
+    {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("How does it work?")
+                .setMessage("Here you can find list of all created tests. \n" +
+                        "To start learning tap on the name test that you are interested in. \n" +
+                        "To take a test long click name of the test.")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        dialog.create().show();
+    }
+
 
 
 }

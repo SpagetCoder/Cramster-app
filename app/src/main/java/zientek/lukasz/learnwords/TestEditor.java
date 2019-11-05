@@ -53,7 +53,7 @@ public class TestEditor extends AppCompatActivity
     ImageView mPreviewIv;
 
     EditText inputDialog;
-    private String dialogInput;
+    private String userInput;
 
     private static final int CAMERA_REQUEST_CODE = 1;
     private static final int STORAGE_REQUEST_CODE = 2;
@@ -167,15 +167,18 @@ public class TestEditor extends AppCompatActivity
                 .setPositiveButton("Save", null)
                 .show();
 
+        if(mFileName != null)
+            inputDialog.setText(mFileName);
+
         Button positiveButton = builder.getButton(AlertDialog.BUTTON_POSITIVE);
         positiveButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                dialogInput = inputDialog.getText().toString();
+                userInput = inputDialog.getText().toString();
 
-                if (dialogInput.trim().isEmpty())
+                if (userInput.trim().isEmpty())
                 {
                     inputDialog.setText("");
                     inputDialog.setHintTextColor(Color.RED);
@@ -196,7 +199,7 @@ public class TestEditor extends AppCompatActivity
         try{ Looper.loop(); }
         catch(RuntimeException e){}
 
-        return dialogInput;
+        return userInput;
     }
 
     public boolean checkIfFileExists(String fileName)

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TestScreen">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:progressTint="@color/colorPrimary"
+            android:id="@+id/progress"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15dp"
+                android:id="@+id/question_number"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/parent_linear_layout_learn">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:id="@+id/question"
+            android:text="Sample text"
+            android:textSize="50dp"
+            android:gravity="center"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/anwswer"
+            android:hint="Your translation"/>
+
+        <Button
+            android:id="@+id/add_field_button"
+            android:layout_width="112dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@drawable/button"
+            android:paddingLeft="5dp"
+            android:text="Next"
+            android:textColor="#FFF"
+            android:textSize="15dp"
+            android:onClick="nextQuestion"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
