@@ -87,19 +87,15 @@ public class TestScreen extends AppCompatActivity
         {
             if(wrongWordsCount < questions.size())
             {
-                String filename;
-
                 if(!mFileName.contains(" - words you still need to learn"))
-                    filename = mFileName + " - words you still need to learn";
-                else
-                    filename = mFileName;
+                    this.mFileName = mFileName + " - words you still need to learn";
 
                 String fileContents = wrongWords.toString();
                 FileOutputStream outputStream;
 
                 try
                 {
-                    outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                    outputStream = openFileOutput(mFileName, Context.MODE_PRIVATE);
                     outputStream.write(fileContents.getBytes());
                     outputStream.close();
                 }
@@ -110,7 +106,8 @@ public class TestScreen extends AppCompatActivity
             }
 
             final AlertDialog builder = new AlertDialog.Builder(this)
-                    .setTitle("Test compleated")
+                    .setTitle("Test completed")
+                    .setCancelable(false)
                     .setPositiveButton("Again", null)
                     .setNeutralButton("Only worng words", null)
                     .setNegativeButton("Leave",null)
@@ -123,6 +120,7 @@ public class TestScreen extends AppCompatActivity
                 @Override
                 public void onClick(View v)
                 {
+                    finish();
                     Intent intent = new Intent(getApplicationContext(), TestScreen.class);
                     intent.putExtra("FILE_NAME", mFileName);
                     startActivity(intent);
@@ -137,10 +135,9 @@ public class TestScreen extends AppCompatActivity
                 @Override
                 public void onClick(View v)
                 {
+                    finish();
                     Intent intent = new Intent(getApplicationContext(), TestScreen.class);
-
-                    ///do naprawy
-                    intent.putExtra("FILE_NAME", mFileName + " - words you still need to learn");
+                    intent.putExtra("FILE_NAME", mFileName);
                     startActivity(intent);
                 }
             });
