@@ -58,14 +58,35 @@ public class TestCreationMenu extends AppCompatActivity
             }
         });
 
-        mListViewTests.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        mListViewTests.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id)
             {
-                String filename = mListViewTests.getItemAtPosition(position).toString();
-                File fileToDelete = new File(fileDir,filename);
-                fileToDelete.delete();
-                updateView();
+                final AlertDialog.Builder builder = new AlertDialog.Builder(TestCreationMenu.this);
+                builder.setTitle("Delete?");
+                builder.setMessage("Are you sure you want to delete selected test?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        String filename = mListViewTests.getItemAtPosition(position).toString();
+                        File fileToDelete = new File(fileDir,filename);
+                        fileToDelete.delete();
+                        updateView();
+                    }
+                });
+
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
+                    }
+                });
+
+                builder.show();
                 return true;
             }
         });

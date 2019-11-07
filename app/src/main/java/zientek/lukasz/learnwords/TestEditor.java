@@ -60,8 +60,8 @@ public class TestEditor extends AppCompatActivity
     private static final int IMAGE_GALLERY_REQUEST_CODE = 3;
     private static final int IMAGE_CAMERA_REQUEST_CODE = 4;
 
-    String cameraPermission[];
-    String storagePermission[];
+    String[] cameraPermission;
+    String[] storagePermission;
     Uri image_uri;
 
     @Override
@@ -523,6 +523,11 @@ public class TestEditor extends AppCompatActivity
                                 {
                                     firstTime = false;
                                     stringBuilder.append(element.getValue());
+                                }
+
+                                else if(element.getValue().equals("-"))
+                                {
+                                    continue;
                                 }
 
                                 else if(rightOfLeft-leftOfRight >= -60 && (bottom-element.getBoundingBox().bottom <= 70

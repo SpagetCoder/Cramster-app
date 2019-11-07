@@ -60,18 +60,30 @@ public class TestScreen extends AppCompatActivity
         {
             Toast.makeText(this, "Correct", Toast.LENGTH_SHORT).show();
             correctAnws++;
+            position++;
+            mProgressBar.setProgress((position+1)*100 / questions.size());
+            askQuestion();
         }
 
         else
         {
+            final AlertDialog builder = new AlertDialog.Builder(this)
+                    .setTitle("Wrong answer")
+                    .setMessage("Correct translation is " + questions.get(position).getCorrectTranslation())
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            position++;
+                            mProgressBar.setProgress((position+1)*100 / questions.size());
+                            askQuestion();
+                        }
+                    })
+                    .show();
+
             wrongWords.append(questions.get(position).getWord()).append(" - ").append(questions.get(position).getCorrectTranslation()).append("\n");
             wrongWordsCount++;
         }
-
-        position++;
-        mProgressBar.setProgress((position+1)*100 / questions.size());
-        askQuestion();
-
     }
 
     public void askQuestion()
@@ -85,7 +97,7 @@ public class TestScreen extends AppCompatActivity
 
         else
         {
-            if(wrongWordsCount < questions.size())
+            if(wrongWordsCount < questions.size() && wrongWordsCount != 0)
             {
                 if(!mFileName.contains(" - words you still need to learn"))
                     this.mFileName = mFileName + " - words you still need to learn";
@@ -109,7 +121,7 @@ public class TestScreen extends AppCompatActivity
                     .setTitle("Test completed")
                     .setCancelable(false)
                     .setPositiveButton("Again", null)
-                    .setNeutralButton("Only worng words", null)
+                    .setNeutralButton("Only wrong words", null)
                     .setNegativeButton("Leave",null)
                     .show();
 
@@ -128,8 +140,8 @@ public class TestScreen extends AppCompatActivity
             });
 
             Button neutralButton = builder.getButton(AlertDialog.BUTTON_NEUTRAL);
-            if(wrongWordsCount == questions.size())
-            neutralButton.setEnabled(false);
+            if(wrongWordsCount == questions.size() || correctAnws == questions.size())
+                neutralButton.setEnabled(false);
 
             neutralButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -142,8 +154,8 @@ public class TestScreen extends AppCompatActivity
                 }
             });
 
-            Button netativeButton = builder.getButton(AlertDialog.BUTTON_NEGATIVE);
-            netativeButton.setOnClickListener(new View.OnClickListener() {
+            Button negativeButton = builder.getButton(AlertDialog.BUTTON_NEGATIVE);
+            negativeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v)
                 {

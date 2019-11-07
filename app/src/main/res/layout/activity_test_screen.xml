@@ -25,7 +25,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"
+                android:textSize="15sp"
                 android:id="@+id/question_number"/>
         </LinearLayout>
     </LinearLayout>
@@ -40,14 +40,15 @@
             android:layout_height="200dp"
             android:id="@+id/question"
             android:text="Sample text"
-            android:textSize="50dp"
+            android:textSize="50sp"
             android:gravity="center"/>
 
         <EditText
+            android:id="@+id/anwswer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/anwswer"
-            android:hint="Your translation"/>
+            android:hint="@string/your_translation"
+            android:inputType="text" />
 
         <Button
             android:id="@+id/add_field_button"
@@ -56,9 +57,9 @@
             android:layout_gravity="center"
             android:background="@drawable/button"
             android:paddingLeft="5dp"
-            android:text="Next"
+            android:text="@string/next"
             android:textColor="#FFF"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:onClick="nextQuestion"/>
 
     </LinearLayout>
