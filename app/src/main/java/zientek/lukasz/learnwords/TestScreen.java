@@ -1,6 +1,7 @@
 package zientek.lukasz.learnwords;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import zientek.lukasz.learnwords.model.TestQuestions;
 
 public class TestScreen extends AppCompatActivity
@@ -53,7 +55,6 @@ public class TestScreen extends AppCompatActivity
         askQuestion();
     }
 
-
     public void nextQuestion(View view)
     {
         if(mUserInput.getText().toString().trim().equals(questions.get(position).getCorrectTranslation()))
@@ -67,19 +68,21 @@ public class TestScreen extends AppCompatActivity
 
         else
         {
-            final AlertDialog builder = new AlertDialog.Builder(this)
-                    .setTitle("Wrong answer")
-                    .setMessage("Correct translation is " + questions.get(position).getCorrectTranslation())
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            position++;
-                            mProgressBar.setProgress((position+1)*100 / questions.size());
-                            askQuestion();
-                        }
-                    })
-                    .show();
+            final SweetAlertDialog dialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+            dialog.setTitle("Wrong answer");
+            dialog.setContentText("Correct translation is: " + questions.get(position).getCorrectTranslation());
+            dialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener()
+            {
+                @Override
+                public void onClick(SweetAlertDialog sweetAlertDialog)
+                {
+                    position++;
+                    mProgressBar.setProgress((position+1)*100 / questions.size());
+                    askQuestion();
+                    dialog.dismiss();
+                }
+            });
+            dialog.show();
 
             wrongWords.append(questions.get(position).getWord()).append(" - ").append(questions.get(position).getCorrectTranslation()).append("\n");
             wrongWordsCount++;
@@ -117,20 +120,13 @@ public class TestScreen extends AppCompatActivity
                 }
             }
 
-            final AlertDialog builder = new AlertDialog.Builder(this)
-                    .setTitle("Test completed")
-                    .setCancelable(false)
-                    .setPositiveButton("Again", null)
-                    .setNeutralButton("Only wrong words", null)
-                    .setNegativeButton("Leave",null)
-                    .show();
-
-
-            Button positiveButton = builder.getButton(AlertDialog.BUTTON_POSITIVE);
-            positiveButton.setOnClickListener(new View.OnClickListener()
+            SweetAlertDialog dialog = new SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE);
+            dialog.setTitle("Test completed");
+            dialog.setCancelable(false);
+            dialog.setConfirmButton("Repeat", new SweetAlertDialog.OnSweetClickListener()
             {
                 @Override
-                public void onClick(View v)
+                public void onClick(SweetAlertDialog sweetAlertDialog)
                 {
                     finish();
                     Intent intent = new Intent(getApplicationContext(), TestScreen.class);
@@ -139,29 +135,35 @@ public class TestScreen extends AppCompatActivity
                 }
             });
 
-            Button neutralButton = builder.getButton(AlertDialog.BUTTON_NEUTRAL);
+            dialog.setNeutralButton("⟲", new SweetAlertDialog.OnSweetClickListener()
+            {
+                @Override
+                public void onClick(SweetAlertDialog sweetAlertDialog)
+                {
+                    finish();
+                    Intent intent = new Intent(getApplicationContext(), TestScreen.class);
+                    intent.putExtra("FILE_NAME", mFileName);
+                    startActivity(intent);
+                }
+            });
+
+            dialog.setCancelButton("Leave", new SweetAlertDialog.OnSweetClickListener()
+            {
+                @Override
+                public void onClick(SweetAlertDialog sweetAlertDialog)
+                {
+                    finish();
+                }
+            });
+
+            dialog.show();
             if(wrongWordsCount == questions.size() || correctAnws == questions.size())
-                neutralButton.setEnabled(false);
+                dialog.getButton(SweetAlertDialog.BUTTON_NEUTRAL).setVisibility(View.GONE);
 
-            neutralButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v)
-                {
-                    finish();
-                    Intent intent = new Intent(getApplicationContext(), TestScreen.class);
-                    intent.putExtra("FILE_NAME", mFileName);
-                    startActivity(intent);
-                }
-            });
+            Button btn = dialog.findViewById(R.id.neutral_button);
+            btn.setTextSize(35);
+            btn.setPadding(0,-15,0,0);
 
-            Button negativeButton = builder.getButton(AlertDialog.BUTTON_NEGATIVE);
-            negativeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v)
-                {
-                    finish();
-                }
-            });
         }
     }
 

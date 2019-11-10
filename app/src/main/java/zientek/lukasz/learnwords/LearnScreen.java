@@ -18,7 +18,6 @@ import java.io.InputStreamReader;
 
 public class LearnScreen extends AppCompatActivity
 {
-
     private LinearLayout parentLinearLayoutLearn;
     private String mFileName;
 

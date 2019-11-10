@@ -1,17 +1,21 @@
 package zientek.lukasz.learnwords;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -23,6 +27,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class TestCreationMenu extends AppCompatActivity
 {
@@ -60,33 +66,43 @@ public class TestCreationMenu extends AppCompatActivity
 
         mListViewTests.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
         {
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id)
             {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(TestCreationMenu.this);
-                builder.setTitle("Delete?");
-                builder.setMessage("Are you sure you want to delete selected test?");
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                final SweetAlertDialog dialog = new SweetAlertDialog(TestCreationMenu.this, SweetAlertDialog.WARNING_TYPE);
+                dialog.setTitle("Delete?");
+                dialog.setContentText("Are you sure you want to delete selected test?");
+                dialog.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener()
+                {
                     @Override
-                    public void onClick(DialogInterface dialog, int which)
+                    public void onClick(SweetAlertDialog sweetAlertDialog)
                     {
                         String filename = mListViewTests.getItemAtPosition(position).toString();
                         File fileToDelete = new File(fileDir,filename);
                         fileToDelete.delete();
                         updateView();
+                        sweetAlertDialog.dismiss();
                     }
                 });
 
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener()
-                {
+                dialog.setCancelButton("No", new SweetAlertDialog.OnSweetClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which)
+                    public void onClick(SweetAlertDialog sweetAlertDialog)
                     {
-                        dialog.dismiss();
+                        sweetAlertDialog.dismiss();
                     }
                 });
 
-                builder.show();
+                dialog.show();
+
+                // custom button
+//                Button btn = dialog.findViewById(R.id.confirm_button);
+//                btn.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button));
+//                btn.setTextSize(35);
+//                btn.setPadding(0,-15,0,0);
+//                btn.setText("⟲");
+
                 return true;
             }
         });

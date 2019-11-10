@@ -26,7 +26,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -44,6 +43,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
 public class TestEditor extends AppCompatActivity
@@ -161,20 +162,15 @@ public class TestEditor extends AppCompatActivity
 
         inputDialog = new EditText(this);
 
-        final AlertDialog builder = new AlertDialog.Builder(this)
-                .setTitle("Name your test")
-                .setView(inputDialog)
-                .setPositiveButton("Save", null)
-                .show();
-
         if(mFileName != null)
             inputDialog.setText(mFileName);
 
-        Button positiveButton = builder.getButton(AlertDialog.BUTTON_POSITIVE);
-        positiveButton.setOnClickListener(new View.OnClickListener()
-        {
+        final SweetAlertDialog dialog = new SweetAlertDialog(this);
+        dialog.setTitle("Name your test");
+        dialog.setCustomView(inputDialog);
+        dialog.setConfirmButton("Save", new SweetAlertDialog.OnSweetClickListener() {
             @Override
-            public void onClick(View v)
+            public void onClick(SweetAlertDialog sweetAlertDialog)
             {
                 userInput = inputDialog.getText().toString();
 
@@ -182,19 +178,41 @@ public class TestEditor extends AppCompatActivity
                 {
                     inputDialog.setText("");
                     inputDialog.setHintTextColor(Color.RED);
-                    inputDialog.setHint(" Please provide a name");
+                    inputDialog.setHint("Please provide a name");
                 }
 
-//                else if (checkIfFileExists(dialogInput))
-//                {
-//                    Toast.makeText(TestEditor.this, "fdsfsfsdf", Toast.LENGTH_SHORT).show();
-//                }
+                if(checkIfFileExists(userInput))
+                {
+                    SweetAlertDialog dialog2 = new SweetAlertDialog(TestEditor.this, SweetAlertDialog.WARNING_TYPE);
+                    dialog2.setTitle("Overwrite?");
+                    dialog2.setContentText("Test with that name already exists. Do you want to overwrite it?");
+                    dialog2.setCancelable(false);
+                    dialog2.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog)
+                        {
+                            handler.sendMessage(handler.obtainMessage());
+                        }
+                    });
+
+                    dialog2.setCancelButton("No",new SweetAlertDialog.OnSweetClickListener()
+                    {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog)
+                        {
+                            sweetAlertDialog.dismiss();
+                        }
+                    });
+
+                    dialog2.show();
+                }
 
                 else
                     handler.sendMessage(handler.obtainMessage());
-
             }
         });
+
+        dialog.show();
 
         try{ Looper.loop(); }
         catch(RuntimeException e){}
@@ -525,14 +543,13 @@ public class TestEditor extends AppCompatActivity
                                     stringBuilder.append(element.getValue());
                                 }
 
-                                else if(element.getValue().equals("-"))
+                                else if(element.getValue().trim().equals("-"))
                                 {
                                     continue;
                                 }
 
                                 else if(rightOfLeft-leftOfRight >= -60 && (bottom-element.getBoundingBox().bottom <= 70
-                                        && bottom - element.getBoundingBox().bottom >= -70)
-                                        && !element.getValue().endsWith("-"))
+                                        && bottom - element.getBoundingBox().bottom >= -70))
                                 {
                                     stringBuilder.append(" ").append(element.getValue());
                                 }
@@ -591,8 +608,6 @@ public class TestEditor extends AppCompatActivity
             }
 
             deleteCache(this);
-
         }
     }
-
 }

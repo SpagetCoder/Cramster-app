@@ -16,6 +16,8 @@ import android.widget.ListView;
 import java.io.File;
 import java.util.ArrayList;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class LearnMenu extends AppCompatActivity
 {
 
@@ -92,20 +94,11 @@ public class LearnMenu extends AppCompatActivity
 
     private void showHelpDialog()
     {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("How does it work?")
-                .setMessage("Here you can find list of all created tests. \n" +
-                        "To start learning tap on the name test that you are interested in. \n" +
-                        "To take a test long click name of the test.")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-        dialog.create().show();
+        new SweetAlertDialog(this)
+                .setTitleText("How does it work?")
+                .setContentText("To start learning tap name of the test that you are interested in. \n"
+                        + "To take a test click and hold on name of the test that you are interested in.")
+                .show();
     }
-
-
 
 }
