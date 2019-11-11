@@ -42,8 +42,15 @@ public class TestCreationMenu extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-        updateView();
+
+        ArrayList<String> tests = new ArrayList<>();
         final File fileDir = this.getFilesDir();
+
+        for(String file: fileDir.list())
+            tests.add(0,file);
+
+        final ListViewAdapter listViewAdapter = new ListViewAdapter(this, R.layout.test_item_layout, tests);
+        mListViewTests.setAdapter(listViewAdapter);
 
         mListViewTests.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
@@ -51,50 +58,93 @@ public class TestCreationMenu extends AppCompatActivity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 String filename = mListViewTests.getItemAtPosition(position).toString();
-
                 Intent intent = new Intent(TestCreationMenu.this, TestEditor.class);
                 intent.putExtra("FILE_NAME", filename);
                 startActivity(intent);
             }
         });
 
-        mListViewTests.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        mListViewTests.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        mListViewTests.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener()
         {
-            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id)
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked)
             {
-                final SweetAlertDialog dialog = new SweetAlertDialog(TestCreationMenu.this, SweetAlertDialog.WARNING_TYPE);
-                dialog.setTitle("Delete?");
-                dialog.setContentText("Are you sure you want to delete selected test?");
-                dialog.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener()
-                {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog)
-                    {
-                        String filename = mListViewTests.getItemAtPosition(position).toString();
-                        File fileToDelete = new File(fileDir,filename);
-                        fileToDelete.delete();
-                        updateView();
-                        sweetAlertDialog.dismiss();
-                    }
-                });
+                final int checkedCount = mListViewTests.getCheckedItemCount();
+                mode.setTitle(checkedCount + " Selected");
+                listViewAdapter.toggleSelection(position);
+            }
 
-                dialog.setCancelButton("No", new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog)
-                    {
-                        sweetAlertDialog.dismiss();
-                    }
-                });
-
-                dialog.show();
-
-                Button confirm = dialog.findViewById(R.id.confirm_button);
-                confirm.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button_green));
-                Button cancel = dialog.findViewById(R.id.cancel_button);
-                cancel.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button_red));
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu)
+            {
+                mode.getMenuInflater().inflate(R.menu.menu_test_list_delete, menu);
                 return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu)
+            {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(final ActionMode mode, MenuItem item)
+            {
+                int id = item.getItemId();
+
+                if(id == R.id.delete)
+                {
+                    final SweetAlertDialog dialog = new SweetAlertDialog(TestCreationMenu.this, SweetAlertDialog.WARNING_TYPE);
+                    dialog.setTitle("Delete?");
+                    if(listViewAdapter.getSelectedIds().size() == 1)
+                        dialog.setContentText("Are you sure you want to delete selected test?");
+                    else
+                        dialog.setContentText("Are you sure you want to delete selected tests?");
+
+                    dialog.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener()
+                    {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog)
+                        {
+                            SparseBooleanArray selected = listViewAdapter.getSelectedIds();
+                            for (int i = (selected.size() - 1); i >= 0; i--)
+                            {
+                                if (selected.valueAt(i))
+                                {
+                                    String filename = mListViewTests.getItemAtPosition(i).toString();
+                                    File fileToDelete = new File(fileDir,filename);
+                                    fileToDelete.delete();
+                                    updateView();
+                                    sweetAlertDialog.dismiss();
+                                }
+                            }
+                            mode.finish();
+                        }
+                    });
+
+                    dialog.setCancelButton("No", new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog)
+                        {
+                            sweetAlertDialog.dismiss();
+                        }
+                    });
+
+                    dialog.show();
+                    Button confirm = dialog.findViewById(R.id.confirm_button);
+                    confirm.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button_green));
+                    Button cancel = dialog.findViewById(R.id.cancel_button);
+                    cancel.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button_red));
+                }
+
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode)
+            {
+                listViewAdapter.removeSelection();
             }
         });
     }
@@ -107,10 +157,8 @@ public class TestCreationMenu extends AppCompatActivity
         for(String file: fileDir.list())
             tests.add(0,file);
 
-        //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,tests);
-        final ListViewAdapter listViewAdapter = new ListViewAdapter(this,R.layout.test_item_layout, tests);
+        final ListViewAdapter listViewAdapter = new ListViewAdapter(this, R.layout.test_item_layout, tests);
         mListViewTests.setAdapter(listViewAdapter);
-
     }
 
     @Override
