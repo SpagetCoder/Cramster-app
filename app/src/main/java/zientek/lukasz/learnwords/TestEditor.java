@@ -6,10 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -26,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -181,7 +180,7 @@ public class TestEditor extends AppCompatActivity
                     inputDialog.setHint("Please provide a name");
                 }
 
-                if(checkIfFileExists(userInput))
+                else if(checkIfFileExists(userInput))
                 {
                     SweetAlertDialog dialog2 = new SweetAlertDialog(TestEditor.this, SweetAlertDialog.WARNING_TYPE);
                     dialog2.setTitle("Overwrite?");
@@ -205,6 +204,11 @@ public class TestEditor extends AppCompatActivity
                     });
 
                     dialog2.show();
+
+                    Button confirm = dialog2.findViewById(R.id.confirm_button);
+                    Button cancel = dialog2.findViewById(R.id.cancel_button);
+                    confirm.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
+                    cancel.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_red));
                 }
 
                 else
@@ -213,6 +217,8 @@ public class TestEditor extends AppCompatActivity
         });
 
         dialog.show();
+        Button save = dialog.findViewById(R.id.confirm_button);
+        save.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
 
         try{ Looper.loop(); }
         catch(RuntimeException e){}
@@ -363,53 +369,52 @@ public class TestEditor extends AppCompatActivity
 
     private void showImageImportDialog()
     {
-        String[] items = {"Camera", "Gallery"};
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Select image");
-        dialog.setItems(items, new DialogInterface.OnClickListener()
-        {
+        SweetAlertDialog dialog = new SweetAlertDialog(TestEditor.this);
+        dialog.setTitle("Import image from");
+        dialog.setConfirmButton("Camera", new SweetAlertDialog.OnSweetClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
+            public void onClick(SweetAlertDialog sweetAlertDialog)
             {
-                if (which == 0)
-                {
-                    // camera
-                    if (!checkCameraPermission())
-                        requestCameraPermission();
+                if (!checkCameraPermission())
+                    requestCameraPermission();
 
-                    else
-                        pickCamera();
-                }
+                else
+                    pickCamera();
 
-                if (which == 1)
-                {
-                    // gallery
-                    if (!checkStoragePermission())
-                        requestStoragePermission();
-
-                    else
-                        pickGallery();
-                }
-
+                sweetAlertDialog.dismiss();
             }
         });
-        dialog.create().show();
+        dialog.setCancelButton("Gallery", new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog)
+            {
+                if (!checkStoragePermission())
+                    requestStoragePermission();
+
+                else
+                    pickGallery();
+
+                sweetAlertDialog.dismiss();
+            }
+        });
+        dialog.show();
+
+        Button button = dialog.findViewById(R.id.confirm_button);
+        Button button2 = dialog.findViewById(R.id.cancel_button);
+        button.setBackground(ContextCompat.getDrawable(this, R.drawable.button_green));
+        button2.setBackground(ContextCompat.getDrawable(this, R.drawable.button_green));
     }
 
     private void showHelpDialog()
     {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("How to create a test")
-                .setMessage("To manually add field simply click on add field button. \n" +
-                        "To add words from photo click on photo icon. \n \n" +
-                        "When you are done with adding new words click on disc icon to save the test.")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-        dialog.create().show();
+        SweetAlertDialog dialog = new SweetAlertDialog(TestEditor.this);
+        dialog.setTitle("How to create a test");
+        dialog.setContentText("To manually add field click on the add field button. "
+                + "To add words from photo click on the photo icon. "
+                + "To save your test click on the disc icon.");
+        dialog.show();
+        Button button = dialog.findViewById(R.id.confirm_button);
+        button.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
     }
 
     private void pickGallery()

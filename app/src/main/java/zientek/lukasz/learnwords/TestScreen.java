@@ -83,6 +83,8 @@ public class TestScreen extends AppCompatActivity
                 }
             });
             dialog.show();
+            Button button = dialog.findViewById(R.id.confirm_button);
+            button.setBackground(ContextCompat.getDrawable(TestScreen.this, R.drawable.button_green));
 
             wrongWords.append(questions.get(position).getWord()).append(" - ").append(questions.get(position).getCorrectTranslation()).append("\n");
             wrongWordsCount++;
@@ -95,7 +97,7 @@ public class TestScreen extends AppCompatActivity
         {
             mUserInput.setText("");
             mQuestion.setText(questions.get(position).getWord());
-            mQuestionNumber.setText("Test progress: " + (position+1));
+            mQuestionNumber.setText("Test progress: " + (position+1) + "/" + questions.size());
         }
 
         else
@@ -122,8 +124,9 @@ public class TestScreen extends AppCompatActivity
 
             SweetAlertDialog dialog = new SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE);
             dialog.setTitle("Test completed");
+            dialog.setContentText("Correct answers: " + correctAnws + "/" + questions.size());
             dialog.setCancelable(false);
-            dialog.setConfirmButton("Repeat", new SweetAlertDialog.OnSweetClickListener()
+            dialog.setConfirmButton("⟳", new SweetAlertDialog.OnSweetClickListener()
             {
                 @Override
                 public void onClick(SweetAlertDialog sweetAlertDialog)
@@ -135,7 +138,7 @@ public class TestScreen extends AppCompatActivity
                 }
             });
 
-            dialog.setNeutralButton("⟲", new SweetAlertDialog.OnSweetClickListener()
+            dialog.setNeutralButton("⟳", new SweetAlertDialog.OnSweetClickListener()
             {
                 @Override
                 public void onClick(SweetAlertDialog sweetAlertDialog)
@@ -147,7 +150,7 @@ public class TestScreen extends AppCompatActivity
                 }
             });
 
-            dialog.setCancelButton("Leave", new SweetAlertDialog.OnSweetClickListener()
+            dialog.setCancelButton("←", new SweetAlertDialog.OnSweetClickListener()
             {
                 @Override
                 public void onClick(SweetAlertDialog sweetAlertDialog)
@@ -160,9 +163,20 @@ public class TestScreen extends AppCompatActivity
             if(wrongWordsCount == questions.size() || correctAnws == questions.size())
                 dialog.getButton(SweetAlertDialog.BUTTON_NEUTRAL).setVisibility(View.GONE);
 
-            Button btn = dialog.findViewById(R.id.neutral_button);
-            btn.setTextSize(35);
-            btn.setPadding(0,-15,0,0);
+            Button buttonWrongWords = dialog.findViewById(R.id.neutral_button);
+            buttonWrongWords.setTextSize(35);
+            buttonWrongWords.setPadding(0,-17,0,0);
+            buttonWrongWords.setBackground(ContextCompat.getDrawable(TestScreen.this, R.drawable.button_accent));
+
+            Button button = dialog.findViewById(R.id.confirm_button);
+            button.setTextSize(35);
+            button.setPadding(0,-17,0,0);
+            button.setBackground(ContextCompat.getDrawable(TestScreen.this, R.drawable.button_green));
+
+            Button buttonLeave = dialog.findViewById(R.id.cancel_button);
+            buttonLeave.setTextSize(35);
+            buttonLeave.setPadding(0,-24,0,0);
+            buttonLeave.setBackground(ContextCompat.getDrawable(TestScreen.this, R.drawable.button_red));
 
         }
     }

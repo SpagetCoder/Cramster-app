@@ -22,6 +22,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".LearnMenu"
+            android:label="Choose a test"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity

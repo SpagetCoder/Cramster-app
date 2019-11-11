@@ -4,31 +4,26 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import zientek.lukasz.learnwords.model.ListViewAdapter;
+import zientek.lukasz.learnwords.model.ListViewElement;
 
 public class TestCreationMenu extends AppCompatActivity
 {
@@ -41,7 +36,6 @@ public class TestCreationMenu extends AppCompatActivity
         setContentView(R.layout.activity_test_creation_menu);
 
         mListViewTests = (ListView) findViewById(R.id.main_listview_tests);
-
     }
 
     @Override
@@ -96,13 +90,10 @@ public class TestCreationMenu extends AppCompatActivity
 
                 dialog.show();
 
-                // custom button
-//                Button btn = dialog.findViewById(R.id.confirm_button);
-//                btn.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button));
-//                btn.setTextSize(35);
-//                btn.setPadding(0,-15,0,0);
-//                btn.setText("⟲");
-
+                Button confirm = dialog.findViewById(R.id.confirm_button);
+                confirm.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button_green));
+                Button cancel = dialog.findViewById(R.id.cancel_button);
+                cancel.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button_red));
                 return true;
             }
         });
@@ -116,8 +107,10 @@ public class TestCreationMenu extends AppCompatActivity
         for(String file: fileDir.list())
             tests.add(0,file);
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,tests);
-        mListViewTests.setAdapter(arrayAdapter);
+        //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,tests);
+        final ListViewAdapter listViewAdapter = new ListViewAdapter(this,R.layout.test_item_layout, tests);
+        mListViewTests.setAdapter(listViewAdapter);
+
     }
 
     @Override
@@ -146,20 +139,13 @@ public class TestCreationMenu extends AppCompatActivity
 
     private void showHelpDialog()
     {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("How does it work?")
-                .setMessage("Here you can find list of all created tests. \n" +
-                        "To create a new test click on plus button. \n" +
-                        "To modify a test click on the name of the test. \n" +
-                        "To delete a test long press on the name of the test.")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-        dialog.create().show();
+        SweetAlertDialog dialog = new SweetAlertDialog(TestCreationMenu.this);
+        dialog.setTitle("How does it work?");
+        dialog.setContentText("To create a test click on the plus button. "
+                + "To modify a test click on the name of the test. "
+                + "To delete a test click and hold name of the test.");
+        dialog.show();
+        Button button = dialog.findViewById(R.id.confirm_button);
+        button.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button_green));
     }
-
-
 }
