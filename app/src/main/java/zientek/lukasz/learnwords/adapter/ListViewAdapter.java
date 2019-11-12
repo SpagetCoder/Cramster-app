@@ -1,4 +1,4 @@
-package zientek.lukasz.learnwords.model;
+package zientek.lukasz.learnwords.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -37,7 +37,6 @@ public class ListViewAdapter extends ArrayAdapter
     public View getView(int position, View convertView, ViewGroup parent)
     {
         ViewHolder holder = null;
-        ListViewElement listViewElement = new ListViewElement(getItem(position));
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null)
@@ -50,7 +49,7 @@ public class ListViewAdapter extends ArrayAdapter
         else
             holder = (ViewHolder) convertView.getTag();
 
-        holder.testName.setText(listViewElement.getTestName());
+        holder.testName.setText(getItem(position).toString());
 
         return convertView;
     }
@@ -80,10 +79,6 @@ public class ListViewAdapter extends ArrayAdapter
         else
             selectedItemsId.delete(position);
         notifyDataSetChanged();
-    }
-
-    public int getSelectedCount() {
-        return selectedItemsId.size();
     }
 
     public SparseBooleanArray getSelectedIds() {

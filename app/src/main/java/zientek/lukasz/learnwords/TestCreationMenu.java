@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -22,12 +21,12 @@ import java.io.File;
 import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
-import zientek.lukasz.learnwords.model.ListViewAdapter;
-import zientek.lukasz.learnwords.model.ListViewElement;
+import zientek.lukasz.learnwords.adapter.ListViewAdapter;
 
 public class TestCreationMenu extends AppCompatActivity
 {
     private ListView mListViewTests;
+    private int statusBarColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -75,9 +74,13 @@ public class TestCreationMenu extends AppCompatActivity
                 listViewAdapter.toggleSelection(position);
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu)
             {
+//                statusBarColor = getWindow().getStatusBarColor();
+//                getWindow().setStatusBarColor(Color.parseColor("#363636"));
+
                 mode.getMenuInflater().inflate(R.menu.menu_test_list_delete, menu);
                 return true;
             }
@@ -145,6 +148,7 @@ public class TestCreationMenu extends AppCompatActivity
             public void onDestroyActionMode(ActionMode mode)
             {
                 listViewAdapter.removeSelection();
+//                getWindow().setStatusBarColor(statusBarColor);
             }
         });
     }
