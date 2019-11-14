@@ -16,6 +16,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -115,7 +116,7 @@ public class TestCreationMenu extends AppCompatActivity
                             {
                                 if (selected.valueAt(i))
                                 {
-                                    String filename = mListViewTests.getItemAtPosition(i).toString();
+                                    String filename = mListViewTests.getItemAtPosition(selected.keyAt(i)).toString();
                                     File fileToDelete = new File(fileDir,filename);
                                     fileToDelete.delete();
                                     updateView();

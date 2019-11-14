@@ -553,7 +553,7 @@ public class TestEditor extends AppCompatActivity
                                     continue;
                                 }
 
-                                else if(rightOfLeft-leftOfRight >= -60 && (bottom-element.getBoundingBox().bottom <= 70
+                                else if(rightOfLeft-leftOfRight >= -50 && (bottom-element.getBoundingBox().bottom <= 70
                                         && bottom - element.getBoundingBox().bottom >= -70))
                                 {
                                     stringBuilder.append(" ").append(element.getValue());
@@ -579,7 +579,8 @@ public class TestEditor extends AppCompatActivity
                         Toast.makeText(this, "Couldn't convert given photo. Try again", Toast.LENGTH_LONG).show();
 
                     String finalResult = stringBuilder.toString();
-                    String finalResultAfterValidation = finalResult.replaceAll("(-)+","-");
+                    String firstValidation = finalResult.replaceAll(", -",", ").replaceAll(",-", ", ");
+                    String finalResultAfterValidation = firstValidation.replaceAll("(-)+","-");
                     String[] linesOfWords = finalResultAfterValidation.split("\n");
 
                     for(int i = 0; i < linesOfWords.length; i++)
