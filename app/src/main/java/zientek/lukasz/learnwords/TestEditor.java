@@ -304,7 +304,7 @@ public class TestEditor extends AppCompatActivity
         int missingElements = 0;
         int size = parentLinearLayout.getChildCount();
 
-        for (int i=0 ; i < size-1 ; i++)
+        for (int i = 0 ; i < size-1 ; i++)
         {
             View view = parentLinearLayout.getChildAt(i);
             EditText text = view.findViewById(R.id.edit_text);
@@ -522,7 +522,10 @@ public class TestEditor extends AppCompatActivity
                 TextRecognizer recognizer = new TextRecognizer.Builder(getApplicationContext()).build();
 
                 if (!recognizer.isOperational())
+                {
                     Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 else {
                     Frame frame = new Frame.Builder().setBitmap(bitmap).build();
@@ -536,6 +539,7 @@ public class TestEditor extends AppCompatActivity
                     for (int index = 0; index < textBlocks.size(); index++)
                     {
                         TextBlock tBlock = textBlocks.valueAt(index);
+
                         for (Text line : tBlock.getComponents())
                         {
                             for (Text element : line.getComponents())
@@ -553,13 +557,13 @@ public class TestEditor extends AppCompatActivity
                                     continue;
                                 }
 
-                                else if(rightOfLeft-leftOfRight >= -50 && (bottom-element.getBoundingBox().bottom <= 70
-                                        && bottom - element.getBoundingBox().bottom >= -70))
+                                else if(rightOfLeft-leftOfRight >= -50 && (bottom - element.getBoundingBox().bottom <= 40
+                                        && bottom - element.getBoundingBox().bottom >= -40))
                                 {
                                     stringBuilder.append(" ").append(element.getValue());
                                 }
 
-                                else if (bottom-element.getBoundingBox().bottom <= 70 && bottom - element.getBoundingBox().bottom >= -70)
+                                else if (bottom-element.getBoundingBox().bottom <= 50 && bottom - element.getBoundingBox().bottom >= -50)
                                 {
                                     stringBuilder.append("-").append(element.getValue());
                                 }
