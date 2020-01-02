@@ -8,11 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import zientek.lukasz.learnwords.R;
 
 public class ListViewAdapter extends ArrayAdapter
@@ -34,7 +34,8 @@ public class ListViewAdapter extends ArrayAdapter
         TextView testName;
     }
 
-    public View getView(int position, View convertView, ViewGroup parent)
+    @NotNull
+    public View getView(int position, View convertView, @NotNull ViewGroup parent)
     {
         ViewHolder holder = null;
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -43,7 +44,7 @@ public class ListViewAdapter extends ArrayAdapter
         {
             convertView = mInflater.inflate(R.layout.test_item_layout, null);
             holder = new ViewHolder();
-            holder.testName = (TextView) convertView.findViewById(R.id.test_title);
+            holder.testName = convertView.findViewById(R.id.test_title);
             convertView.setTag(holder);
         }
         else
@@ -72,7 +73,7 @@ public class ListViewAdapter extends ArrayAdapter
         notifyDataSetChanged();
     }
 
-    public void selectView(int position, boolean value)
+    private void selectView(int position, boolean value)
     {
         if (value)
             selectedItemsId.put(position, value);

@@ -206,15 +206,9 @@ public class TestScreen extends AppCompatActivity
             }
         }
 
-        catch (FileNotFoundException x)
-        {
+        catch (FileNotFoundException x) { }
 
-        }
-
-        catch (IOException x)
-        {
-
-        }
+        catch (IOException x) { }
 
     }
 }

@@ -42,9 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
-
 
 public class TestEditor extends AppCompatActivity
 {
@@ -171,7 +169,7 @@ public class TestEditor extends AppCompatActivity
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog)
             {
-                userInput = inputDialog.getText().toString();
+                userInput = inputDialog.getText().toString().replaceAll("\\s+$", "");
 
                 if (userInput.trim().isEmpty())
                 {
@@ -292,7 +290,10 @@ public class TestEditor extends AppCompatActivity
             View view = parentLinearLayout.getChildAt(i);
             EditText text = view.findViewById(R.id.edit_text);
             EditText text2 = view.findViewById(R.id.edit_text2);
-            stringBuilder.append(text.getText().toString()).append(" - ").append(text2.getText().toString()).append("\n");
+
+            stringBuilder.append(text.getText().toString().replaceAll("\\s+$", ""))
+                    .append(" - ").append(text2.getText().toString()
+                    .replaceAll("\\s+$", "")).append("\n");
         }
 
         return stringBuilder.toString();
@@ -330,6 +331,12 @@ public class TestEditor extends AppCompatActivity
         if(missingElements == 0 && size != 1)
             completeInput = true;
 
+        else if(missingElements == 0)
+            Toast.makeText(this,"Incomplete data: No words were added", Toast.LENGTH_SHORT).show();
+
+        else
+            Toast.makeText(this,"Incomplete data: " + missingElements + " elements missing", Toast.LENGTH_SHORT).show();
+
         return completeInput;
     }
 
@@ -347,9 +354,7 @@ public class TestEditor extends AppCompatActivity
 
         if(id == R.id.saveTest)
         {
-            if(!checkIfComplete())
-                Toast.makeText(this, "Incomplete data", Toast.LENGTH_SHORT).show();
-            else
+            if(checkIfComplete())
             {
                 saveTest();
                 super.finish();
@@ -494,6 +499,99 @@ public class TestEditor extends AppCompatActivity
 
     }
 
+    public void ProcessTheData(Bitmap bitmap, TextRecognizer recognizer)
+    {
+        Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+        SparseArray<TextBlock> textBlocks = recognizer.detect(frame);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        int rightOfLeft = 0;
+        int bottom = 0;
+        boolean firstTime = true;
+
+        for (int index = 0; index < textBlocks.size(); index++)
+        {
+            TextBlock tBlock = textBlocks.valueAt(index);
+            for (Text line : tBlock.getComponents())
+            {
+                for (final Text element : line.getComponents())
+                {
+                    int leftOfRight = element.getBoundingBox().left;
+
+                    if(firstTime)
+                    {
+                        firstTime = false;
+                        stringBuilder.append(element.getValue());
+                    }
+
+                    else if(element.getValue().trim().equals("-"))
+                    {
+                        continue;
+                    }
+
+                    else if(rightOfLeft-leftOfRight >= -50 && (bottom - element.getBoundingBox().bottom <= 40
+                            && bottom - element.getBoundingBox().bottom >= -40))
+                    {
+                        stringBuilder.append(" ").append(element.getValue());
+                    }
+
+                    else if (bottom-element.getBoundingBox().bottom <= 50 && bottom - element.getBoundingBox().bottom >= -50)
+                    {
+                        stringBuilder.append("-").append(element.getValue());
+                    }
+
+                    else
+                    {
+                        stringBuilder.append("\n").append(element.getValue());
+                    }
+
+                    bottom = element.getBoundingBox().bottom;
+                    rightOfLeft = element.getBoundingBox().right;
+                }
+            }
+        }
+
+
+        if (stringBuilder.length() == 0)
+            Toast.makeText(this, "Couldn't convert given photo. Try again", Toast.LENGTH_LONG).show();
+
+        else
+        {
+            String finalResult = stringBuilder.toString();
+            String firstValidation = finalResult.replaceAll(", -",", ").replaceAll(",-", ", ");
+            String finalResultAfterValidation = firstValidation.replaceAll("(-)+","-");
+            String[] linesOfWords = finalResultAfterValidation.split("\n");
+
+            for(int i = 0; i < linesOfWords.length; i++)
+            {
+                String lineWords = linesOfWords[i];
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                final View rowView = inflater.inflate(R.layout.field, null);
+                EditText out1 = rowView.findViewById(R.id.edit_text);
+                EditText out2 = rowView.findViewById(R.id.edit_text2);
+
+                try
+                {
+                    String[] singleWords = lineWords.split("-");
+                    if(singleWords[0].equals(""))
+                        out1.setHint("No word given");
+                    else
+                        out1.setText(singleWords[0]);
+
+                    out2.setText(singleWords[1]);
+                    parentLinearLayout.addView(rowView, parentLinearLayout.getChildCount() - 1);
+                }
+
+                catch (Exception x)
+                {
+                    out1.setText(linesOfWords[i]);
+                    out2.setHint("No translation");
+                    parentLinearLayout.addView(rowView, parentLinearLayout.getChildCount() - 1);
+                }
+            }
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
     {
@@ -527,93 +625,9 @@ public class TestEditor extends AppCompatActivity
                     return;
                 }
 
-                else {
-                    Frame frame = new Frame.Builder().setBitmap(bitmap).build();
-                    SparseArray<TextBlock> textBlocks = recognizer.detect(frame);
-                    StringBuilder stringBuilder = new StringBuilder();
-
-                    int rightOfLeft = 0;
-                    int bottom = 0;
-                    boolean firstTime = true;
-
-                    for (int index = 0; index < textBlocks.size(); index++)
-                    {
-                        TextBlock tBlock = textBlocks.valueAt(index);
-
-                        for (Text line : tBlock.getComponents())
-                        {
-                            for (Text element : line.getComponents())
-                            {
-                                int leftOfRight = element.getBoundingBox().left;
-
-                                if(firstTime)
-                                {
-                                    firstTime = false;
-                                    stringBuilder.append(element.getValue());
-                                }
-
-                                else if(element.getValue().trim().equals("-"))
-                                {
-                                    continue;
-                                }
-
-                                else if(rightOfLeft-leftOfRight >= -50 && (bottom - element.getBoundingBox().bottom <= 40
-                                        && bottom - element.getBoundingBox().bottom >= -40))
-                                {
-                                    stringBuilder.append(" ").append(element.getValue());
-                                }
-
-                                else if (bottom-element.getBoundingBox().bottom <= 50 && bottom - element.getBoundingBox().bottom >= -50)
-                                {
-                                    stringBuilder.append("-").append(element.getValue());
-                                }
-
-                                else
-                                {
-                                    stringBuilder.append("\n").append(element.getValue());
-                                }
-
-                                bottom = element.getBoundingBox().bottom;
-                                rightOfLeft = element.getBoundingBox().right;
-                            }
-                        }
-                    }
-
-                    if (stringBuilder.length() == 0)
-                        Toast.makeText(this, "Couldn't convert given photo. Try again", Toast.LENGTH_LONG).show();
-
-                    String finalResult = stringBuilder.toString();
-                    String firstValidation = finalResult.replaceAll(", -",", ").replaceAll(",-", ", ");
-                    String finalResultAfterValidation = firstValidation.replaceAll("(-)+","-");
-                    String[] linesOfWords = finalResultAfterValidation.split("\n");
-
-                    for(int i = 0; i < linesOfWords.length; i++)
-                    {
-                        String lineWords = linesOfWords[i];
-                        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        final View rowView = inflater.inflate(R.layout.field, null);
-                        EditText out1 = rowView.findViewById(R.id.edit_text);
-                        EditText out2 = rowView.findViewById(R.id.edit_text2);
-
-                        try
-                        {
-                            String[] singleWords = lineWords.split("-");
-                            if(singleWords[0].equals(""))
-                                out1.setHint("No word given");
-                            else
-                                out1.setText(singleWords[0]);
-
-                            out2.setText(singleWords[1]);
-                            parentLinearLayout.addView(rowView, parentLinearLayout.getChildCount() - 1);
-                        }
-
-                        catch (Exception x)
-                        {
-                            out1.setText(linesOfWords[i]);
-                            out2.setHint("No translation");
-                            parentLinearLayout.addView(rowView, parentLinearLayout.getChildCount() - 1);
-                        }
-                    }
+                else
+                {
+                    ProcessTheData(bitmap,recognizer);
                 }
             }
 

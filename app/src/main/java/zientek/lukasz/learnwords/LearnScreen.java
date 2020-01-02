@@ -65,14 +65,8 @@ public class LearnScreen extends AppCompatActivity
 
         }
 
-        catch(FileNotFoundException x)
-        {
-
-        }
-        catch(IOException x )
-        {
-
-        }
+        catch (FileNotFoundException x) { }
+        catch(IOException x ) { }
     }
 
 }

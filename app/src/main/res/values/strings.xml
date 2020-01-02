@@ -9,4 +9,7 @@
     <string name="your_translation">Your translation</string>
     <string name="next">Next</string>
     <string name="delete">Delete</string>
+    <string name="sample_text">Sample Text</string>
+    <string name="learn">Learn</string>
+    <string name="create_a_test">Create a Test</string>
 </resources>
