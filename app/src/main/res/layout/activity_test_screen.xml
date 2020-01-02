@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".TestScreen">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -13,37 +13,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:progressTint="@color/colorPrimary"
-            android:id="@+id/progress"/>
+            android:theme="@style/progressBarColour"
+            android:id="@+id/progress" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:id="@+id/question_number"/>
+                android:id="@+id/question_number"
+                android:layout_below="@id/progress" />
+    </RelativeLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/parent_linear_layout_learn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/parent_linear_layout_learn">
+        android:orientation="vertical">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
             android:id="@+id/question"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:gravity="center"
             android:text="Sample text"
-            android:textSize="50sp"
-            android:gravity="center"/>
+            android:layout_centerHorizontal="true"
+            android:textSize="50sp" />
 
         <EditText
             android:id="@+id/anwswer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/your_translation"
-            android:inputType="text" />
+            android:layout_centerHorizontal="true"
+            android:inputType="text"
+            android:layout_below="@id/question"
+            android:layout_marginTop="50dp"/>
 
         <Button
             android:id="@+id/add_field_button"
@@ -51,12 +56,15 @@
             android:layout_height="50dp"
             android:layout_gravity="center"
             android:background="@drawable/button_green"
+            android:onClick="nextQuestion"
             android:paddingLeft="5dp"
             android:text="@string/next"
             android:textColor="#FFF"
             android:textSize="15sp"
-            android:onClick="nextQuestion"/>
+            android:layout_centerInParent="true"
+            android:layout_below="@id/anwswer"
+            android:layout_marginTop="20dp"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

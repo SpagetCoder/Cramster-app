@@ -9,6 +9,10 @@
         <item name="colorControlActivated">@android:color/darker_gray</item>
     </style>
 
+    <style name="progressBarColour" parent="@style/Theme.AppCompat">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
