@@ -15,9 +15,12 @@
         android:theme="@style/AppTheme">
         <activity android:name=".TestScreen"
             android:parentActivityName=".LearnMenu"
+            android:windowSoftInputMode="stateAlwaysVisible"
+            android:label="Test"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".LearnScreen"
+            android:label="Memorize"
             android:parentActivityName=".LearnMenu"
             android:screenOrientation="portrait" />
         <activity

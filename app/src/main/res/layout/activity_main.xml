@@ -1,58 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sample Text"
+        android:text="@string/cramster"
         android:textSize="50sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.248" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp"/>
 
     <Button
         android:id="@+id/learn"
         android:layout_width="140dp"
         android:layout_height="44dp"
         android:layout_gravity="center"
-        android:background="@drawable/button_green"
+        android:background="@drawable/button_primary"
         android:onClick="goToLearnMenu"
         android:paddingLeft="5dp"
         android:text="@string/learn"
         android:textColor="#FFF"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.512" />
+        android:layout_centerInParent="true"
+        android:layout_below="@id/name"
+        android:layout_marginTop="100dp"/>
 
     <Button
         android:id="@+id/test_create"
         android:layout_width="140dp"
         android:layout_height="44dp"
         android:layout_gravity="center"
-        android:background="@drawable/button_green"
+        android:background="@drawable/button_primary"
         android:onClick="goToTestCreation"
         android:paddingLeft="5dp"
         android:text="@string/create_a_test"
         android:textColor="#FFF"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.637" />
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/learn"
+        android:layout_marginTop="30dp"/>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

@@ -49,10 +49,8 @@ public class TestEditor extends AppCompatActivity
     private LinearLayout parentLinearLayout;
     private String mFileName;
     ImageView mPreviewIv;
-
     EditText inputDialog;
     private String userInput;
-
     private static final int CAMERA_REQUEST_CODE = 1;
     private static final int STORAGE_REQUEST_CODE = 2;
     private static final int IMAGE_GALLERY_REQUEST_CODE = 3;
@@ -288,12 +286,13 @@ public class TestEditor extends AppCompatActivity
         for (int i=0 ; i < size-1 ; i++)
         {
             View view = parentLinearLayout.getChildAt(i);
-            EditText text = view.findViewById(R.id.edit_text);
-            EditText text2 = view.findViewById(R.id.edit_text2);
+            EditText eText = view.findViewById(R.id.edit_text);
+            EditText eText2 = view.findViewById(R.id.edit_text2);
 
-            stringBuilder.append(text.getText().toString().replaceAll("\\s+$", ""))
-                    .append(" - ").append(text2.getText().toString()
-                    .replaceAll("\\s+$", "")).append("\n");
+            String text = eText.getText().toString().trim();
+            String text2 = eText2.getText().toString().trim();
+
+            stringBuilder.append(text).append(" - ").append(text2).append("\n");
         }
 
         return stringBuilder.toString();
@@ -453,8 +452,7 @@ public class TestEditor extends AppCompatActivity
 
     private boolean checkStoragePermission()
     {
-        boolean result = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
-        return result;
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
     }
 
     private boolean checkCameraPermission()

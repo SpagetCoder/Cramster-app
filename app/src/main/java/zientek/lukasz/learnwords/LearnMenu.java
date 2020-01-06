@@ -37,6 +37,7 @@ public class LearnMenu extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
+
         ArrayList<String> tests = new ArrayList<>();
         final File fileDir = this.getFilesDir();
 
@@ -68,7 +69,6 @@ public class LearnMenu extends AppCompatActivity
                 Intent intent = new Intent(LearnMenu.this, TestScreen.class);
                 intent.putExtra("FILE_NAME", filename);
                 startActivity(intent);
-//                updateView();
                 return true;
             }
         });

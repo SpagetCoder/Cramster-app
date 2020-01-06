@@ -27,7 +27,6 @@ import zientek.lukasz.learnwords.adapter.ListViewAdapter;
 public class TestCreationMenu extends AppCompatActivity
 {
     private ListView mListViewTests;
-    private int statusBarColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -75,13 +74,9 @@ public class TestCreationMenu extends AppCompatActivity
                 listViewAdapter.toggleSelection(position);
             }
 
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu)
             {
-//                statusBarColor = getWindow().getStatusBarColor();
-//                getWindow().setStatusBarColor(Color.parseColor("#363636"));
-
                 mode.getMenuInflater().inflate(R.menu.menu_test_list_delete, menu);
                 return true;
             }
@@ -99,8 +94,9 @@ public class TestCreationMenu extends AppCompatActivity
 
                 if(id == R.id.delete)
                 {
-                    final SweetAlertDialog dialog = new SweetAlertDialog(TestCreationMenu.this, SweetAlertDialog.WARNING_TYPE);
+                    SweetAlertDialog dialog = new SweetAlertDialog(TestCreationMenu.this, SweetAlertDialog.WARNING_TYPE);
                     dialog.setTitle("Delete?");
+
                     if(listViewAdapter.getSelectedIds().size() == 1)
                         dialog.setContentText("Are you sure you want to delete selected test?");
                     else
@@ -119,7 +115,7 @@ public class TestCreationMenu extends AppCompatActivity
                                     String filename = mListViewTests.getItemAtPosition(selected.keyAt(i)).toString();
                                     File fileToDelete = new File(fileDir,filename);
                                     fileToDelete.delete();
-                                    updateView();
+                                    onResume();
                                     sweetAlertDialog.dismiss();
                                 }
                             }
@@ -149,21 +145,8 @@ public class TestCreationMenu extends AppCompatActivity
             public void onDestroyActionMode(ActionMode mode)
             {
                 listViewAdapter.removeSelection();
-//                getWindow().setStatusBarColor(statusBarColor);
             }
         });
-    }
-
-    public void updateView()
-    {
-        ArrayList<String> tests = new ArrayList<>();
-        final File fileDir = this.getFilesDir();
-
-        for(String file: fileDir.list())
-            tests.add(0,file);
-
-        final ListViewAdapter listViewAdapter = new ListViewAdapter(this, R.layout.test_item_layout, tests);
-        mListViewTests.setAdapter(listViewAdapter);
     }
 
     @Override

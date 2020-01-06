@@ -12,4 +12,6 @@
     <string name="sample_text">Sample Text</string>
     <string name="learn">Learn</string>
     <string name="create_a_test">Create a Test</string>
+    <string name="cramster">Cramster</string>
+    <string name="add_field">Add field</string>
 </resources>

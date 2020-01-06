@@ -9,9 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import zientek.lukasz.learnwords.R;
 
