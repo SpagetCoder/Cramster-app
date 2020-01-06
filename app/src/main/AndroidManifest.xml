@@ -19,7 +19,7 @@
             android:label="Test"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".LearnScreen"
+            android:name=".learn_screen.LearnScreen"
             android:label="Memorize"
             android:parentActivityName=".LearnMenu"
             android:screenOrientation="portrait" />

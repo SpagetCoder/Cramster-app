@@ -3,8 +3,6 @@ package zientek.lukasz.learnwords;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,6 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import zientek.lukasz.learnwords.learn_screen.LearnScreen;
 
 public class LearnMenu extends AppCompatActivity
 {

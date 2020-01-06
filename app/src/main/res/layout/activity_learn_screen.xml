@@ -8,16 +8,9 @@
     android:gravity="center_horizontal"
     tools:context=".MainActivity">
 
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_learn"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/parent_linear_layout_learn">
-
-        </LinearLayout>
-    </ScrollView>
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>
