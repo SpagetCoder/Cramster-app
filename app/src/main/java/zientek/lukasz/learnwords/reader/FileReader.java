@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import zientek.lukasz.learnwords.model.Pair;
+import zientek.lukasz.learnwords.model.TestQuestions;
 
 public class FileReader {
 
@@ -22,18 +22,18 @@ public class FileReader {
         this.context = context;
     }
 
-    public List<Pair<String, String>> getWords() {
+    public List<TestQuestions> getWords() {
         try {
             FileInputStream fileInputStream = context.openFileInput(fileName);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-            List<Pair<String, String>> wordsList = new ArrayList<>();
             String lines;
             String[] singleWords;
+            List<TestQuestions> wordsList = new ArrayList<>();
             while ((lines = bufferedReader.readLine()) != null) {
                 singleWords = lines.split(" - ");
-                wordsList.add(new Pair<>(singleWords[0], singleWords[1]));
+                wordsList.add(new TestQuestions(singleWords[0], singleWords[1]));
             }
             return wordsList;
         } catch (FileNotFoundException ignored) {
@@ -42,4 +42,5 @@ public class FileReader {
 
         return new ArrayList<>();
     }
+
 }

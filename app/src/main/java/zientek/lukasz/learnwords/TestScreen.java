@@ -23,9 +23,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import zientek.lukasz.learnwords.model.TestQuestions;
+import zientek.lukasz.learnwords.reader.FileReader;
 
 public class TestScreen extends AppCompatActivity
 {
@@ -183,32 +185,8 @@ public class TestScreen extends AppCompatActivity
 
     public void setQuestions()
     {
-        try
-        {
-            FileInputStream fileInputStream = openFileInput(mFileName);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuilder stringBuilder = new StringBuilder();
-
-            String lines;
-            while((lines = bufferedReader.readLine()) != null)
-            {
-                stringBuilder.append(lines).append("\n");
-            }
-
-            String[] linesOfWords = stringBuilder.toString().split("\n");
-
-            for(int i = 0; i < linesOfWords.length; i++)
-            {
-                String lineWords = linesOfWords[i];
-                String[] singleWords = lineWords.split(" - ");
-                questions.add(new TestQuestions(singleWords[0],singleWords[1]));
-            }
-        }
-
-        catch (FileNotFoundException x) { }
-
-        catch (IOException x) { }
-
+        FileReader fileReader = new FileReader(this, mFileName);
+        List<TestQuestions> questionsList = fileReader.getWords();
+        questions.addAll(questionsList);
     }
 }

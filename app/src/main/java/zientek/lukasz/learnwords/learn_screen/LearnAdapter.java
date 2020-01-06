@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import zientek.lukasz.learnwords.R;
-import zientek.lukasz.learnwords.model.Pair;
+import zientek.lukasz.learnwords.model.TestQuestions;
 
 public class LearnAdapter extends RecyclerView.Adapter<LearnAdapter.LearnViewHolder> {
 
-    private List<Pair<String, String>> wordsList;
+    private List<TestQuestions> wordsList;
 
     LearnAdapter(){
         wordsList = new ArrayList<>();
@@ -39,7 +39,7 @@ public class LearnAdapter extends RecyclerView.Adapter<LearnAdapter.LearnViewHol
         return wordsList.size();
     }
 
-    void submitList(List<Pair<String, String>> wordsList){
+    void submitList(List<TestQuestions> wordsList){
         this.wordsList = wordsList;
         notifyDataSetChanged();
     }
@@ -55,9 +55,9 @@ public class LearnAdapter extends RecyclerView.Adapter<LearnAdapter.LearnViewHol
             right = itemView.findViewById(R.id.tv_word_right);
         }
 
-        void bind(Pair<String, String> wordPair){
-            left.setText(wordPair.getFirst());
-            right.setText(wordPair.getSecond());
+        void bind(TestQuestions question){
+            left.setText(question.getWord());
+            right.setText(question.getCorrectTranslation());
         }
 
     }

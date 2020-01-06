@@ -11,7 +11,7 @@ import android.os.Bundle;
 import java.util.List;
 
 import zientek.lukasz.learnwords.R;
-import zientek.lukasz.learnwords.model.Pair;
+import zientek.lukasz.learnwords.model.TestQuestions;
 
 public class LearnScreen extends AppCompatActivity
 {
@@ -42,9 +42,9 @@ public class LearnScreen extends AppCompatActivity
     }
 
     private void subscribeWords() {
-        viewModel.getWords().observe(this, new Observer<List<Pair<String, String>>>() {
+        viewModel.getWords().observe(this, new Observer<List<TestQuestions>>() {
             @Override
-            public void onChanged(List<Pair<String, String>> pairs) {
+            public void onChanged(List<TestQuestions> pairs) {
                 adapter.submitList(pairs);
             }
         });

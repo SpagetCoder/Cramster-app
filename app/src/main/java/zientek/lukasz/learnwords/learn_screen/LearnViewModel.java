@@ -8,13 +8,13 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
-import zientek.lukasz.learnwords.model.Pair;
+import zientek.lukasz.learnwords.model.TestQuestions;
 import zientek.lukasz.learnwords.reader.FileReader;
 
 public class LearnViewModel extends ViewModel {
 
-    private MutableLiveData<List<Pair<String, String>>> words;
-    LiveData<List<Pair<String, String>>> getWords(){
+    private MutableLiveData<List<TestQuestions>> words;
+    LiveData<List<TestQuestions>> getWords(){
         if (words == null){
             words = new MutableLiveData<>();
         }
@@ -27,7 +27,7 @@ public class LearnViewModel extends ViewModel {
 
     void readFile(Context context, String fileName){
         FileReader fileReader = new FileReader(context, fileName);
-        List<Pair<String, String>> list = fileReader.getWords();
+        List<TestQuestions> list = fileReader.getWords();
         words.postValue(list);
     }
 
