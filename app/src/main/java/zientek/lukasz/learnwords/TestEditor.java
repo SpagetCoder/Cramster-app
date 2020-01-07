@@ -60,6 +60,8 @@ public class TestEditor extends AppCompatActivity
     String[] storagePermission;
     Uri image_uri;
 
+    private ShowDialogListener showDialogListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -75,6 +77,13 @@ public class TestEditor extends AppCompatActivity
 
         if(mFileName != null)
             readTest(mFileName);
+
+        showDialogListener = new ShowDialogListener() {
+            @Override
+            public void showDialog() {
+                createDialog2();
+            }
+        };
 
     }
 
@@ -146,14 +155,6 @@ public class TestEditor extends AppCompatActivity
 
     public String askTestName()
     {
-        final Handler handler = new Handler()
-        {
-            @Override
-            public void handleMessage(Message mesg)
-            {
-                throw new RuntimeException();
-            }
-        };
 
         inputDialog = new EditText(this);
 
@@ -178,37 +179,11 @@ public class TestEditor extends AppCompatActivity
 
                 else if(checkIfFileExists(userInput))
                 {
-                    SweetAlertDialog dialog2 = new SweetAlertDialog(TestEditor.this, SweetAlertDialog.WARNING_TYPE);
-                    dialog2.setTitle("Overwrite?");
-                    dialog2.setContentText("Test with that name already exists. Do you want to overwrite it?");
-                    dialog2.setCancelable(false);
-                    dialog2.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog)
-                        {
-                            handler.sendMessage(handler.obtainMessage());
-                        }
-                    });
-
-                    dialog2.setCancelButton("No",new SweetAlertDialog.OnSweetClickListener()
-                    {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog)
-                        {
-                            sweetAlertDialog.dismiss();
-                        }
-                    });
-
-                    dialog2.show();
-
-                    Button confirm = dialog2.findViewById(R.id.confirm_button);
-                    Button cancel = dialog2.findViewById(R.id.cancel_button);
-                    confirm.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
-                    cancel.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_red));
+//                    showDialogListener.showDialog();
                 }
 
                 else
-                    handler.sendMessage(handler.obtainMessage());
+                    sweetAlertDialog.dismissWithAnimation();
             }
         });
 
@@ -216,10 +191,38 @@ public class TestEditor extends AppCompatActivity
         Button save = dialog.findViewById(R.id.confirm_button);
         save.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
 
-        try{ Looper.loop(); }
-        catch(RuntimeException e){}
 
         return userInput;
+    }
+
+    private void createDialog2() {
+        SweetAlertDialog dialog2 = new SweetAlertDialog(TestEditor.this, SweetAlertDialog.WARNING_TYPE);
+        dialog2.setTitle("Overwrite?");
+        dialog2.setContentText("Test with that name already exists. Do you want to overwrite it?");
+        dialog2.setCancelable(false);
+        dialog2.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog)
+            {
+                sweetAlertDialog.dismissWithAnimation();
+            }
+        });
+
+        dialog2.setCancelButton("No",new SweetAlertDialog.OnSweetClickListener()
+        {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog)
+            {
+                sweetAlertDialog.dismissWithAnimation();
+            }
+        });
+
+        dialog2.show();
+
+        Button confirm = dialog2.findViewById(R.id.confirm_button);
+        Button cancel = dialog2.findViewById(R.id.cancel_button);
+        confirm.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
+        cancel.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_red));
     }
 
     public boolean checkIfFileExists(String fileName)
@@ -631,5 +634,9 @@ public class TestEditor extends AppCompatActivity
 
             deleteCache(this);
         }
+    }
+
+    interface ShowDialogListener{
+        void showDialog();
     }
 }
