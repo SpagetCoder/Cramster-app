@@ -21,7 +21,7 @@ public class TestQuestions
         this.word = word;
     }
 
-    public String getCorrectTranslation()
+    public String getTranslation()
     {
         return correctTranslation;
     }

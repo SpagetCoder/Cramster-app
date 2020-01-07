@@ -1,10 +1,7 @@
 package zientek.lukasz.learnwords;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,17 +9,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
+import zientek.lukasz.learnwords.dialogs.DialogMessage;
+import zientek.lukasz.learnwords.model.Helpers;
 
 public class LearnMenu extends AppCompatActivity
 {
     private ListView mListViewTests;
+    private DialogMessage dialogMessage;
+    private Helpers helpers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,7 +29,9 @@ public class LearnMenu extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_menu);
 
-        mListViewTests = (ListView) findViewById(R.id.main_listview_tests);
+        mListViewTests = findViewById(R.id.main_listview_tests);
+        dialogMessage = new DialogMessage();
+        helpers = new Helpers();
     }
 
     @Override
@@ -38,13 +39,8 @@ public class LearnMenu extends AppCompatActivity
     {
         super.onResume();
 
-        ArrayList<String> tests = new ArrayList<>();
-        final File fileDir = this.getFilesDir();
-
-        for(String file: fileDir.list())
-            tests.add(0,file);
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,tests);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, helpers.TestList(this));
         mListViewTests.setAdapter(arrayAdapter);
 
         mListViewTests.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -87,19 +83,10 @@ public class LearnMenu extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.help)
-            showHelpDialog();
+            dialogMessage.showHelpDialog(this,"How does it work?",
+                    "To start learning tap name of the test that you are interested in. \n"
+                    + "To take a test click and hold name of the test that you want to take.");
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void showHelpDialog()
-    {
-        SweetAlertDialog dialog = new SweetAlertDialog(this);
-        dialog.setTitleText("How does it work?");
-        dialog.setContentText("To start learning tap name of the test that you are interested in. \n"
-                        + "To take a test click and hold name of the test that you want to take.");
-        dialog.show();
-        Button button = dialog.findViewById(R.id.confirm_button);
-        button.setBackground(ContextCompat.getDrawable(LearnMenu.this, R.drawable.button_green));
     }
 }

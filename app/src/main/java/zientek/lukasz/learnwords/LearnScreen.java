@@ -6,15 +6,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.List;
+
+import zientek.lukasz.learnwords.model.FileReader;
+import zientek.lukasz.learnwords.model.TestQuestions;
 
 public class LearnScreen extends AppCompatActivity
 {
@@ -33,29 +31,19 @@ public class LearnScreen extends AppCompatActivity
 
     private void readTestWords(String fileName)
     {
-        try
+        FileReader fileReader = new FileReader(this, fileName);
+        List<TestQuestions> questionsList = fileReader.getWords();
+
+        for(int i = 0; i < questionsList.size(); i++)
         {
-            FileInputStream fileInputStream = openFileInput(fileName);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rowView = inflater.inflate(R.layout.learn_field, null);
+            TextView out1 = rowView.findViewById(R.id.edit_text_learn);
+            TextView out2 = rowView.findViewById(R.id.edit_text2_learn);
 
-            String lines;
-            while((lines = bufferedReader.readLine()) != null)
-            {
-                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View rowView = inflater.inflate(R.layout.learn_field, null);
-                TextView out1 = rowView.findViewById(R.id.edit_text_learn);
-                TextView out2 = rowView.findViewById(R.id.edit_text2_learn);
-
-                String[] singleWords = lines.split(" - ");
-                out1.setText(singleWords[0]);
-                out2.setText(singleWords[1]);
-                parentLinearLayoutLearn.addView(rowView, parentLinearLayoutLearn.getChildCount() - 1);
-            }
+            out1.setText(questionsList.get(i).getWord());
+            out2.setText(questionsList.get(i).getTranslation());
+            parentLinearLayoutLearn.addView(rowView, parentLinearLayoutLearn.getChildCount() - 1);
         }
-
-        catch (FileNotFoundException x) { }
-        catch(IOException x ) { }
     }
-
 }

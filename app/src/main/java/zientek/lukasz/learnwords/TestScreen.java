@@ -3,11 +3,8 @@ package zientek.lukasz.learnwords;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,15 +13,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import zientek.lukasz.learnwords.model.FileReader;
 import zientek.lukasz.learnwords.model.TestQuestions;
 
 public class TestScreen extends AppCompatActivity
@@ -57,12 +50,11 @@ public class TestScreen extends AppCompatActivity
 
     public void nextQuestion(View view)
     {
-        if(mUserInput.getText().toString().trim().equals(questions.get(position).getCorrectTranslation()))
+        if(mUserInput.getText().toString().trim().equals(questions.get(position).getTranslation()))
         {
             Toast.makeText(this, "Correct", Toast.LENGTH_SHORT).show();
             correctAnws++;
             position++;
-            mProgressBar.setProgress((position+1)*100 / questions.size());
             askQuestion();
         }
 
@@ -70,23 +62,23 @@ public class TestScreen extends AppCompatActivity
         {
             final SweetAlertDialog dialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
             dialog.setTitle("Wrong answer");
-            dialog.setContentText("Correct translation is: " + questions.get(position).getCorrectTranslation());
+            dialog.setContentText("Correct translation is: " + questions.get(position).getTranslation());
             dialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener()
             {
                 @Override
                 public void onClick(SweetAlertDialog sweetAlertDialog)
                 {
                     position++;
-                    mProgressBar.setProgress((position+1)*100 / questions.size());
                     askQuestion();
                     dialog.dismiss();
                 }
             });
             dialog.show();
+            dialog.setCancelable(false);
             Button button = dialog.findViewById(R.id.confirm_button);
             button.setBackground(ContextCompat.getDrawable(TestScreen.this, R.drawable.button_green));
 
-            wrongWords.append(questions.get(position).getWord()).append(" - ").append(questions.get(position).getCorrectTranslation()).append("\n");
+            wrongWords.append(questions.get(position).getWord()).append(" - ").append(questions.get(position).getTranslation()).append("\n");
             wrongWordsCount++;
         }
     }
@@ -95,6 +87,7 @@ public class TestScreen extends AppCompatActivity
     {
         if(questions.size() > position)
         {
+            mProgressBar.setProgress((position+1)*100 / questions.size());
             mUserInput.setText("");
             mQuestion.setText(questions.get(position).getWord());
             mQuestionNumber.setText("Test progress: " + (position+1) + "/" + questions.size());
@@ -183,32 +176,7 @@ public class TestScreen extends AppCompatActivity
 
     public void setQuestions()
     {
-        try
-        {
-            FileInputStream fileInputStream = openFileInput(mFileName);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuilder stringBuilder = new StringBuilder();
-
-            String lines;
-            while((lines = bufferedReader.readLine()) != null)
-            {
-                stringBuilder.append(lines).append("\n");
-            }
-
-            String[] linesOfWords = stringBuilder.toString().split("\n");
-
-            for(int i = 0; i < linesOfWords.length; i++)
-            {
-                String lineWords = linesOfWords[i];
-                String[] singleWords = lineWords.split(" - ");
-                questions.add(new TestQuestions(singleWords[0],singleWords[1]));
-            }
-        }
-
-        catch (FileNotFoundException x) { }
-
-        catch (IOException x) { }
-
+        FileReader fileReader = new FileReader(this, mFileName);
+        questions = fileReader.getWords();
     }
 }

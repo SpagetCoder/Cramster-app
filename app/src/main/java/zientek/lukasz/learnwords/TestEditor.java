@@ -35,30 +35,32 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-import java.io.BufferedReader;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.List;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import zientek.lukasz.learnwords.model.FileReader;
+import zientek.lukasz.learnwords.model.Helpers;
+import zientek.lukasz.learnwords.model.TestQuestions;
 
 public class TestEditor extends AppCompatActivity
 {
     private LinearLayout parentLinearLayout;
     private String mFileName;
-    ImageView mPreviewIv;
-    EditText inputDialog;
+    private ImageView mPreviewIv;
+    private EditText inputDialog;
     private String userInput;
     private static final int CAMERA_REQUEST_CODE = 1;
     private static final int STORAGE_REQUEST_CODE = 2;
     private static final int IMAGE_GALLERY_REQUEST_CODE = 3;
     private static final int IMAGE_CAMERA_REQUEST_CODE = 4;
 
-    String[] cameraPermission;
-    String[] storagePermission;
-    Uri image_uri;
+    private String[] cameraPermission;
+    private String[] storagePermission;
+    private Uri image_uri;
+    private Helpers helpers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -76,41 +78,7 @@ public class TestEditor extends AppCompatActivity
         if(mFileName != null)
             readTest(mFileName);
 
-    }
-
-    public static void deleteCache(Context context)
-    {
-        try
-        {
-            File dir = context.getCacheDir();
-            deleteDir(dir);
-        }
-        catch (Exception e) {}
-    }
-
-    public static boolean deleteDir(File dir)
-    {
-        if (dir != null && dir.isDirectory())
-        {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++)
-            {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success)
-                {
-                    return false;
-                }
-            }
-            return dir.delete();
-        }
-
-        else if(dir!= null && dir.isFile())
-        {
-            return dir.delete();
-        }
-
-        else
-            return false;
+        helpers = new Helpers();
 
     }
 
@@ -146,6 +114,8 @@ public class TestEditor extends AppCompatActivity
 
     public String askTestName()
     {
+        final File fileDir = this.getFilesDir();
+
         final Handler handler = new Handler()
         {
             @Override
@@ -167,7 +137,7 @@ public class TestEditor extends AppCompatActivity
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog)
             {
-                userInput = inputDialog.getText().toString().replaceAll("\\s+$", "");
+                userInput = inputDialog.getText().toString().trim();
 
                 if (userInput.trim().isEmpty())
                 {
@@ -176,7 +146,7 @@ public class TestEditor extends AppCompatActivity
                     inputDialog.setHint("Please provide a name");
                 }
 
-                else if(checkIfFileExists(userInput))
+                else if(helpers.checkIfFileExists(userInput, fileDir))
                 {
                     SweetAlertDialog dialog2 = new SweetAlertDialog(TestEditor.this, SweetAlertDialog.WARNING_TYPE);
                     dialog2.setTitle("Overwrite?");
@@ -221,60 +191,21 @@ public class TestEditor extends AppCompatActivity
 
         return userInput;
     }
-
-    public boolean checkIfFileExists(String fileName)
-    {
-        final File fileDir = this.getFilesDir();
-
-        for(String file: fileDir.list())
-        {
-            if(file.equals(fileName))
-                return true;
-        }
-
-        return false;
-    }
-
     private void readTest(String fileName)
     {
-        try
+        FileReader fileReader = new FileReader(this, fileName);
+        List<TestQuestions> questionsList = fileReader.getWords();
+
+        for(int i = 0; i < questionsList.size(); i++)
         {
-            FileInputStream fileInputStream = openFileInput(fileName);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuilder stringBuilder = new StringBuilder();
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View rowView = inflater.inflate(R.layout.field, null);
+            EditText out1 = rowView.findViewById(R.id.edit_text);
+            EditText out2 = rowView.findViewById(R.id.edit_text2);
 
-            String lines;
-            while((lines = bufferedReader.readLine()) != null)
-            {
-                stringBuilder.append(lines).append("\n");
-            }
-
-            String[] linesOfWords = stringBuilder.toString().split("\n");
-
-            for(int i = 0; i < linesOfWords.length; i++)
-            {
-                String lineWords = linesOfWords[i];
-                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                final View rowView = inflater.inflate(R.layout.field, null);
-                EditText out1 = rowView.findViewById(R.id.edit_text);
-                EditText out2 = rowView.findViewById(R.id.edit_text2);
-
-                String[] singleWords = lineWords.split(" - ");
-                out1.setText(singleWords[0]);
-                out2.setText(singleWords[1]);
-                parentLinearLayout.addView(rowView, parentLinearLayout.getChildCount() - 1);
-            }
-
-        }
-
-        catch(FileNotFoundException x)
-        {
-
-        }
-        catch(IOException x )
-        {
-
+            out1.setText(questionsList.get(i).getWord());
+            out2.setText(questionsList.get(i).getTranslation());
+            parentLinearLayout.addView(rowView, parentLinearLayout.getChildCount() - 1);
         }
     }
 
@@ -359,7 +290,6 @@ public class TestEditor extends AppCompatActivity
                 super.finish();
                 Toast.makeText(this, "Test saved", Toast.LENGTH_SHORT).show();
             }
-
         }
 
         if(id == R.id.addImage)
@@ -629,7 +559,7 @@ public class TestEditor extends AppCompatActivity
                 }
             }
 
-            deleteCache(this);
+            helpers.deleteCache(this);
         }
     }
 }

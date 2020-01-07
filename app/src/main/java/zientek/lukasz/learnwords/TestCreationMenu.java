@@ -23,18 +23,24 @@ import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import zientek.lukasz.learnwords.adapter.ListViewAdapter;
+import zientek.lukasz.learnwords.dialogs.DialogMessage;
+import zientek.lukasz.learnwords.model.Helpers;
 
 public class TestCreationMenu extends AppCompatActivity
 {
     private ListView mListViewTests;
+    private Helpers helpers;
+    private ArrayList<String> tests;
+    private DialogMessage dialogMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_creation_menu);
-
-        mListViewTests = (ListView) findViewById(R.id.main_listview_tests);
+        helpers = new Helpers();
+        dialogMessage = new DialogMessage();
+        mListViewTests = findViewById(R.id.main_listview_tests);
     }
 
     @Override
@@ -42,12 +48,8 @@ public class TestCreationMenu extends AppCompatActivity
     {
         super.onResume();
 
-        ArrayList<String> tests = new ArrayList<>();
         final File fileDir = this.getFilesDir();
-
-        for(String file: fileDir.list())
-            tests.add(0,file);
-
+        tests = helpers.TestList(this);
         final ListViewAdapter listViewAdapter = new ListViewAdapter(this, R.layout.test_item_layout, tests);
         mListViewTests.setAdapter(listViewAdapter);
 
@@ -168,20 +170,11 @@ public class TestCreationMenu extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.help)
-            showHelpDialog();
+            dialogMessage.showHelpDialog(this,"How does it work?",
+                    "To create a test click on the plus button. "
+                    + "To modify a test click on the name of the test. "
+                    + "To delete a test click and hold name of the test.");
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void showHelpDialog()
-    {
-        SweetAlertDialog dialog = new SweetAlertDialog(TestCreationMenu.this);
-        dialog.setTitle("How does it work?");
-        dialog.setContentText("To create a test click on the plus button. "
-                + "To modify a test click on the name of the test. "
-                + "To delete a test click and hold name of the test.");
-        dialog.show();
-        Button button = dialog.findViewById(R.id.confirm_button);
-        button.setBackground(ContextCompat.getDrawable(TestCreationMenu.this, R.drawable.button_green));
     }
 }

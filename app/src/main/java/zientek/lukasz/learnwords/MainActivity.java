@@ -1,21 +1,17 @@
 package zientek.lukasz.learnwords;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-
-import java.io.File;
 import java.util.ArrayList;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
+import zientek.lukasz.learnwords.dialogs.DialogMessage;
+import zientek.lukasz.learnwords.model.Helpers;
 
 public class MainActivity extends AppCompatActivity
 {
-    ArrayList<String> tests;
+    private ArrayList<String> tests;
+    private DialogMessage dialogMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -23,11 +19,10 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tests = new ArrayList<>();
-        final File fileDir = this.getFilesDir();
+        dialogMessage = new DialogMessage();
+        Helpers helpers = new Helpers();
 
-        for(String file: fileDir.list())
-            tests.add(0,file);
+        tests = helpers.TestList(this);
     }
 
     public void goToTestCreation(View view)
@@ -40,13 +35,9 @@ public class MainActivity extends AppCompatActivity
     {
         if(tests.size() == 0)
         {
-            SweetAlertDialog dialog = new SweetAlertDialog(MainActivity.this);
-            dialog.setTitle("No test found");
-            dialog.setContentText("In order to access this menu there has to be at least one test in the memory. " +
+            dialogMessage.showHelpDialog(this,"No test found",
+                    "In order to access this menu there has to be at least one test in the memory. " +
                     "Please create a test by clicking the create a test button");
-            dialog.show();
-            Button confirm = dialog.findViewById(R.id.confirm_button);
-            confirm.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.button_green));
         }
 
         else
