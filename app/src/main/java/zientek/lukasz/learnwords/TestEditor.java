@@ -51,7 +51,6 @@ public class TestEditor extends AppCompatActivity
     private String mFileName;
     ImageView mPreviewIv;
     EditText inputDialog;
-    private String userInput;
     private static final int CAMERA_REQUEST_CODE = 1;
     private static final int STORAGE_REQUEST_CODE = 2;
     private static final int IMAGE_GALLERY_REQUEST_CODE = 3;
@@ -82,7 +81,7 @@ public class TestEditor extends AppCompatActivity
         showDialogListener = new ShowDialogListener() {
             @Override
             public void showDialog(String fileName) {
-	            createDialog2(fileName);
+	            createOverrideDialog(fileName);
             }
 	
 	        @Override
@@ -140,27 +139,9 @@ public class TestEditor extends AppCompatActivity
     {
         parentLinearLayout.removeView((View) v.getParent());
     }
-
-    private void saveTest()
-    {
-        /*String filename = askTestName();
-        String fileContents = collectInput();
-        FileOutputStream outputStream;
-
-        try
-        {
-            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-            outputStream.write(fileContents.getBytes());
-            outputStream.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }*/
-    }
 	
-	private void newSaveTest() {
-		askTestName();
+	private void saveTest() {
+		displayAskFileNameDialog();
 	}
 	
 	private void saveTestFile(String fileName) {
@@ -178,7 +159,7 @@ public class TestEditor extends AppCompatActivity
 		Toast.makeText(this, "Test saved", Toast.LENGTH_SHORT).show();
 	}
 	
-	public void askTestName()
+	public void displayAskFileNameDialog()
     {
 
         inputDialog = new EditText(this);
@@ -215,7 +196,7 @@ public class TestEditor extends AppCompatActivity
         save.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
     }
 	
-	private void createDialog2(final String fileName) {
+	private void createOverrideDialog(final String fileName) {
         SweetAlertDialog dialog2 = new SweetAlertDialog(TestEditor.this, SweetAlertDialog.WARNING_TYPE);
         dialog2.setTitle("Overwrite?");
         dialog2.setContentText("Test with that name already exists. Do you want to overwrite it?");
@@ -379,7 +360,7 @@ public class TestEditor extends AppCompatActivity
         {
             if(checkIfComplete())
             {
-	            newSaveTest();
+	            saveTest();
             }
 
         }
