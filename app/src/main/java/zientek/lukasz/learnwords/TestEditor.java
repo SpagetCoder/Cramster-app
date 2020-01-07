@@ -1,10 +1,5 @@
 package zientek.lukasz.learnwords;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,9 +10,6 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -29,12 +21,20 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class TestEditor extends AppCompatActivity
@@ -80,9 +81,14 @@ public class TestEditor extends AppCompatActivity
 
         showDialogListener = new ShowDialogListener() {
             @Override
-            public void showDialog() {
-                createDialog2();
+            public void showDialog(String fileName) {
+	            createDialog2(fileName);
             }
+	
+	        @Override
+	        public void saveFile(String enteredFileName) {
+		        saveTestFile(enteredFileName);
+	        }
         };
 
     }
@@ -137,7 +143,7 @@ public class TestEditor extends AppCompatActivity
 
     private void saveTest()
     {
-        String filename = askTestName();
+        /*String filename = askTestName();
         String fileContents = collectInput();
         FileOutputStream outputStream;
 
@@ -150,10 +156,29 @@ public class TestEditor extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
-        }
+        }*/
     }
-
-    public String askTestName()
+	
+	private void newSaveTest() {
+		askTestName();
+	}
+	
+	private void saveTestFile(String fileName) {
+		String fileContents = collectInput();
+		FileOutputStream outputStream;
+		
+		try {
+			outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
+			outputStream.write(fileContents.getBytes());
+			outputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finish();
+		Toast.makeText(this, "Test saved", Toast.LENGTH_SHORT).show();
+	}
+	
+	public void askTestName()
     {
 
         inputDialog = new EditText(this);
@@ -168,34 +193,29 @@ public class TestEditor extends AppCompatActivity
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog)
             {
-                userInput = inputDialog.getText().toString().replaceAll("\\s+$", "");
-
-                if (userInput.trim().isEmpty())
+	            String enteredFileName = inputDialog.getText().toString().replaceAll("\\s+$", "");
+	
+	            if ( enteredFileName.trim().isEmpty() )
                 {
-                    inputDialog.setText("");
                     inputDialog.setHintTextColor(Color.RED);
                     inputDialog.setHint("Please provide a name");
-                }
-
-                else if(checkIfFileExists(userInput))
+                } else if ( checkIfFileExists(enteredFileName) )
                 {
-//                    showDialogListener.showDialog();
-                }
-
-                else
-                    sweetAlertDialog.dismissWithAnimation();
+	                showDialogListener.showDialog(enteredFileName);
+	                sweetAlertDialog.dismissWithAnimation();
+                } else {
+		            showDialogListener.saveFile(enteredFileName);
+		            sweetAlertDialog.dismissWithAnimation();
+	            }
             }
         });
 
         dialog.show();
         Button save = dialog.findViewById(R.id.confirm_button);
         save.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
-
-
-        return userInput;
     }
-
-    private void createDialog2() {
+	
+	private void createDialog2(final String fileName) {
         SweetAlertDialog dialog2 = new SweetAlertDialog(TestEditor.this, SweetAlertDialog.WARNING_TYPE);
         dialog2.setTitle("Overwrite?");
         dialog2.setContentText("Test with that name already exists. Do you want to overwrite it?");
@@ -204,6 +224,7 @@ public class TestEditor extends AppCompatActivity
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog)
             {
+	            showDialogListener.saveFile(fileName);
                 sweetAlertDialog.dismissWithAnimation();
             }
         });
@@ -358,9 +379,7 @@ public class TestEditor extends AppCompatActivity
         {
             if(checkIfComplete())
             {
-                saveTest();
-                super.finish();
-                Toast.makeText(this, "Test saved", Toast.LENGTH_SHORT).show();
+	            newSaveTest();
             }
 
         }
@@ -637,6 +656,8 @@ public class TestEditor extends AppCompatActivity
     }
 
     interface ShowDialogListener{
-        void showDialog();
+	    void showDialog(String fileName);
+	
+	    void saveFile(String enteredFileName);
     }
 }
