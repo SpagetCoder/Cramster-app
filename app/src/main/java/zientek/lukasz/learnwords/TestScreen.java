@@ -153,6 +153,7 @@ public class TestScreen extends AppCompatActivity
             });
 
             dialog.show();
+
             if(wrongWordsCount == questions.size() || correctAnws == questions.size())
                 dialog.getButton(SweetAlertDialog.BUTTON_NEUTRAL).setVisibility(View.GONE);
 

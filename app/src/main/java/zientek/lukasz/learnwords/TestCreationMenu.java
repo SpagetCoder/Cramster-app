@@ -1,11 +1,9 @@
 package zientek.lukasz.learnwords;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -16,7 +14,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,7 +35,7 @@ public class TestCreationMenu extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_creation_menu);
-        helpers = new Helpers();
+        helpers = new Helpers(this);
         dialogMessage = new DialogMessage();
         mListViewTests = findViewById(R.id.main_listview_tests);
     }
@@ -49,7 +46,7 @@ public class TestCreationMenu extends AppCompatActivity
         super.onResume();
 
         final File fileDir = this.getFilesDir();
-        tests = helpers.TestList(this);
+        tests = helpers.testList();
         final ListViewAdapter listViewAdapter = new ListViewAdapter(this, R.layout.test_item_layout, tests);
         mListViewTests.setAdapter(listViewAdapter);
 

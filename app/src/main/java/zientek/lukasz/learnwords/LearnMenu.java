@@ -11,9 +11,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import zientek.lukasz.learnwords.dialogs.DialogMessage;
 import zientek.lukasz.learnwords.model.Helpers;
 
@@ -31,7 +28,7 @@ public class LearnMenu extends AppCompatActivity
 
         mListViewTests = findViewById(R.id.main_listview_tests);
         dialogMessage = new DialogMessage();
-        helpers = new Helpers();
+        helpers = new Helpers(this);
     }
 
     @Override
@@ -40,7 +37,7 @@ public class LearnMenu extends AppCompatActivity
         super.onResume();
 
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, helpers.TestList(this));
+                android.R.layout.simple_list_item_1, helpers.testList());
         mListViewTests.setAdapter(arrayAdapter);
 
         mListViewTests.setOnItemClickListener(new AdapterView.OnItemClickListener()

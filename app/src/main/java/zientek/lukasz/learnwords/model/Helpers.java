@@ -7,8 +7,14 @@ import java.util.ArrayList;
 
 public class Helpers
 {
+    private Context context;
 
-    public ArrayList<String> TestList(Context context)
+    public Helpers(Context context)
+    {
+        this.context = context;
+    }
+
+    public ArrayList<String> testList()
     {
         ArrayList<String> tests = new ArrayList<>();
         final File fileDir = context.getFilesDir();
@@ -19,8 +25,10 @@ public class Helpers
         return tests;
     }
 
-    public boolean checkIfFileExists(String fileName, File fileDir)
+    public boolean checkIfFileExists(String fileName)
     {
+        final File fileDir = context.getFilesDir();
+
         for(String file: fileDir.list())
         {
             if(file.equals(fileName))
@@ -30,7 +38,7 @@ public class Helpers
         return false;
     }
 
-    public void deleteCache(Context context)
+    public void deleteCache()
     {
         try
         {

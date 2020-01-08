@@ -20,9 +20,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         dialogMessage = new DialogMessage();
-        Helpers helpers = new Helpers();
+        Helpers helpers = new Helpers(this);
 
-        tests = helpers.TestList(this);
+        tests = helpers.testList();
     }
 
     public void goToTestCreation(View view)

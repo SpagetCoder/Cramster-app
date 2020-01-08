@@ -1,10 +1,5 @@
 package zientek.lukasz.learnwords;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,11 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.provider.MediaStore;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,38 +20,40 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.Text;
-import com.google.android.gms.vision.text.TextBlock;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-
-import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import zientek.lukasz.learnwords.dialogs.DialogMessage;
 import zientek.lukasz.learnwords.model.FileReader;
 import zientek.lukasz.learnwords.model.Helpers;
+import zientek.lukasz.learnwords.model.Processing;
 import zientek.lukasz.learnwords.model.TestQuestions;
 
 public class TestEditor extends AppCompatActivity
 {
     private LinearLayout parentLinearLayout;
     private String mFileName;
-    private ImageView mPreviewIv;
-    private EditText inputDialog;
-    private String userInput;
+    ImageView mPreviewIv;
+    EditText inputDialog;
     private static final int CAMERA_REQUEST_CODE = 1;
     private static final int STORAGE_REQUEST_CODE = 2;
     private static final int IMAGE_GALLERY_REQUEST_CODE = 3;
     private static final int IMAGE_CAMERA_REQUEST_CODE = 4;
 
-    private String[] cameraPermission;
-    private String[] storagePermission;
-    private Uri image_uri;
+    String[] cameraPermission;
+    String[] storagePermission;
+    Uri image_uri;
     private Helpers helpers;
+    private DialogMessage dialogMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -78,8 +71,8 @@ public class TestEditor extends AppCompatActivity
         if(mFileName != null)
             readTest(mFileName);
 
-        helpers = new Helpers();
-
+        helpers = new Helpers(this);
+        dialogMessage = new DialogMessage();
     }
 
     public void onAddField(View v)
@@ -94,37 +87,28 @@ public class TestEditor extends AppCompatActivity
         parentLinearLayout.removeView((View) v.getParent());
     }
 
-    private void saveTest()
+    private void saveTestFile(String fileName)
     {
-        String filename = askTestName();
         String fileContents = collectInput();
         FileOutputStream outputStream;
 
         try
         {
-            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+            outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
             outputStream.write(fileContents.getBytes());
             outputStream.close();
+
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+        finish();
+        Toast.makeText(this, "Test saved", Toast.LENGTH_SHORT).show();
     }
 
-    public String askTestName()
+    public void askFileNameDialog()
     {
-        final File fileDir = this.getFilesDir();
-
-        final Handler handler = new Handler()
-        {
-            @Override
-            public void handleMessage(Message mesg)
-            {
-                throw new RuntimeException();
-            }
-        };
-
         inputDialog = new EditText(this);
 
         if(mFileName != null)
@@ -137,60 +121,66 @@ public class TestEditor extends AppCompatActivity
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog)
             {
-                userInput = inputDialog.getText().toString().trim();
+                String enteredFileName = inputDialog.getText().toString().trim();
 
-                if (userInput.trim().isEmpty())
+                if (enteredFileName.trim().isEmpty())
                 {
-                    inputDialog.setText("");
                     inputDialog.setHintTextColor(Color.RED);
                     inputDialog.setHint("Please provide a name");
                 }
 
-                else if(helpers.checkIfFileExists(userInput, fileDir))
+                else if (helpers.checkIfFileExists(enteredFileName))
                 {
-                    SweetAlertDialog dialog2 = new SweetAlertDialog(TestEditor.this, SweetAlertDialog.WARNING_TYPE);
-                    dialog2.setTitle("Overwrite?");
-                    dialog2.setContentText("Test with that name already exists. Do you want to overwrite it?");
-                    dialog2.setCancelable(false);
-                    dialog2.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog)
-                        {
-                            handler.sendMessage(handler.obtainMessage());
-                        }
-                    });
-
-                    dialog2.setCancelButton("No",new SweetAlertDialog.OnSweetClickListener()
-                    {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog)
-                        {
-                            sweetAlertDialog.dismiss();
-                        }
-                    });
-
-                    dialog2.show();
-
-                    Button confirm = dialog2.findViewById(R.id.confirm_button);
-                    Button cancel = dialog2.findViewById(R.id.cancel_button);
-                    confirm.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
-                    cancel.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_red));
+                    overrideDialog(enteredFileName);
+                    sweetAlertDialog.dismiss();
                 }
 
                 else
-                    handler.sendMessage(handler.obtainMessage());
+                {
+                    saveTestFile(enteredFileName);
+                    sweetAlertDialog.dismiss();
+                }
             }
         });
 
         dialog.show();
         Button save = dialog.findViewById(R.id.confirm_button);
         save.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
-
-        try{ Looper.loop(); }
-        catch(RuntimeException e){}
-
-        return userInput;
     }
+
+    private void overrideDialog(final String fileName)
+    {
+        SweetAlertDialog dialog2 = new SweetAlertDialog(TestEditor.this, SweetAlertDialog.WARNING_TYPE);
+        dialog2.setTitle("Overwrite?");
+        dialog2.setContentText("Test with that name already exists. Do you want to overwrite it?");
+        dialog2.setCancelable(false);
+        dialog2.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener()
+        {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog)
+            {
+                saveTestFile(fileName);
+                sweetAlertDialog.dismiss();
+            }
+        });
+
+        dialog2.setCancelButton("No",new SweetAlertDialog.OnSweetClickListener()
+        {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog)
+            {
+                sweetAlertDialog.dismiss();
+            }
+        });
+
+        dialog2.show();
+
+        Button confirm = dialog2.findViewById(R.id.confirm_button);
+        Button cancel = dialog2.findViewById(R.id.cancel_button);
+        confirm.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
+        cancel.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_red));
+    }
+
     private void readTest(String fileName)
     {
         FileReader fileReader = new FileReader(this, fileName);
@@ -220,8 +210,13 @@ public class TestEditor extends AppCompatActivity
             EditText eText = view.findViewById(R.id.edit_text);
             EditText eText2 = view.findViewById(R.id.edit_text2);
 
-            String text = eText.getText().toString().trim();
-            String text2 = eText2.getText().toString().trim();
+            String text = eText.getText().toString().trim().replaceAll("\\s+", " ");
+            if(text.contains(" - ") || text.contains(" -") || text.contains("- "))
+                text = text.replaceAll(" - ", "-").replaceAll("- ", "-").replaceAll(" -", "-");
+
+            String text2 = eText2.getText().toString().trim().replaceAll("\\s+", " ");
+            if(text2.contains(" - ") || text2.contains(" -") || text2.contains("- "))
+                text2 = text2.replaceAll(" - ", "-").replaceAll("- ", "-").replaceAll(" -", "-");
 
             stringBuilder.append(text).append(" - ").append(text2).append("\n");
         }
@@ -286,22 +281,24 @@ public class TestEditor extends AppCompatActivity
         {
             if(checkIfComplete())
             {
-                saveTest();
-                super.finish();
-                Toast.makeText(this, "Test saved", Toast.LENGTH_SHORT).show();
+                askFileNameDialog();
             }
+
         }
 
         if(id == R.id.addImage)
-            showImageImportDialog();
+            imageImportDialog();
 
         if (id == R.id.help)
-            showHelpDialog();
+            dialogMessage.showHelpDialog(this, "How to create a test",
+                    "To manually add field click on the add field button. "
+                            + "To add words from photo click on the photo icon. "
+                            + "To save your test click on the disc icon.");
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void showImageImportDialog()
+    private void imageImportDialog()
     {
         SweetAlertDialog dialog = new SweetAlertDialog(TestEditor.this);
         dialog.setTitle("Import image from");
@@ -337,18 +334,6 @@ public class TestEditor extends AppCompatActivity
         Button button2 = dialog.findViewById(R.id.cancel_button);
         button.setBackground(ContextCompat.getDrawable(this, R.drawable.button_green));
         button2.setBackground(ContextCompat.getDrawable(this, R.drawable.button_green));
-    }
-
-    private void showHelpDialog()
-    {
-        SweetAlertDialog dialog = new SweetAlertDialog(TestEditor.this);
-        dialog.setTitle("How to create a test");
-        dialog.setContentText("To manually add field click on the add field button. "
-                + "To add words from photo click on the photo icon. "
-                + "To save your test click on the disc icon.");
-        dialog.show();
-        Button button = dialog.findViewById(R.id.confirm_button);
-        button.setBackground(ContextCompat.getDrawable(TestEditor.this, R.drawable.button_green));
     }
 
     private void pickGallery()
@@ -427,66 +412,14 @@ public class TestEditor extends AppCompatActivity
 
     }
 
-    public void ProcessTheData(Bitmap bitmap, TextRecognizer recognizer)
+    public void fillTheFields(String data)
     {
-        Frame frame = new Frame.Builder().setBitmap(bitmap).build();
-        SparseArray<TextBlock> textBlocks = recognizer.detect(frame);
-        StringBuilder stringBuilder = new StringBuilder();
-
-        int rightOfLeft = 0;
-        int bottom = 0;
-        boolean firstTime = true;
-
-        for (int index = 0; index < textBlocks.size(); index++)
-        {
-            TextBlock tBlock = textBlocks.valueAt(index);
-            for (Text line : tBlock.getComponents())
-            {
-                for (final Text element : line.getComponents())
-                {
-                    int leftOfRight = element.getBoundingBox().left;
-
-                    if(firstTime)
-                    {
-                        firstTime = false;
-                        stringBuilder.append(element.getValue());
-                    }
-
-                    else if(element.getValue().trim().equals("-"))
-                    {
-                        continue;
-                    }
-
-                    else if(rightOfLeft-leftOfRight >= -50 && (bottom - element.getBoundingBox().bottom <= 40
-                            && bottom - element.getBoundingBox().bottom >= -40))
-                    {
-                        stringBuilder.append(" ").append(element.getValue());
-                    }
-
-                    else if (bottom-element.getBoundingBox().bottom <= 50 && bottom - element.getBoundingBox().bottom >= -50)
-                    {
-                        stringBuilder.append("-").append(element.getValue());
-                    }
-
-                    else
-                    {
-                        stringBuilder.append("\n").append(element.getValue());
-                    }
-
-                    bottom = element.getBoundingBox().bottom;
-                    rightOfLeft = element.getBoundingBox().right;
-                }
-            }
-        }
-
-
-        if (stringBuilder.length() == 0)
+        if (data.length() == 0)
             Toast.makeText(this, "Couldn't convert given photo. Try again", Toast.LENGTH_LONG).show();
 
         else
         {
-            String finalResult = stringBuilder.toString();
-            String firstValidation = finalResult.replaceAll(", -",", ").replaceAll(",-", ", ");
+            String firstValidation = data.replaceAll(", -",", ").replaceAll(",-", ", ");
             String finalResultAfterValidation = firstValidation.replaceAll("(-)+","-");
             String[] linesOfWords = finalResultAfterValidation.split("\n");
 
@@ -555,11 +488,12 @@ public class TestEditor extends AppCompatActivity
 
                 else
                 {
-                    ProcessTheData(bitmap,recognizer);
+                    String receivedData = new Processing().processTheData(bitmap,recognizer);
+                    fillTheFields(receivedData);
                 }
             }
 
-            helpers.deleteCache(this);
+            helpers.deleteCache();
         }
     }
 }
